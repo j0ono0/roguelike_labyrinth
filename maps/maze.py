@@ -2,7 +2,7 @@ import random
 import tcod
 
 
-class PrimsMaze:
+class PrimsMaze():
     def __init__(self, width = 20, height = 20):
         self.width = width
         self.height = height

@@ -2,7 +2,8 @@
 import random
 import tcod
 import tcod.event
-from maze import PrimsMaze
+from maps.maze import PrimsMaze
+from maps.dungeon import Dungeon
 from entity import Entity
 
 #################
@@ -32,18 +33,26 @@ tcod.console_set_custom_font(
     tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
 )
 
-# Create the maze
+"""
 map = PrimsMaze(MAP_WIDTH, MAP_HEIGHT)
 map.build()
+"""
 
-# Setup entrance
+map = Dungeon(MAP_WIDTH, MAP_HEIGHT)
+map.build()
+
+# Setup player
 player = Entity('Player_01', '@')
 player.loc.set(*map.entry)
+
+# Update map with player fov
+map.fov.scan(player.loc())
 
 # Setup exit
 exit = Entity('Exit', '>')
 exit.loc.set(*map.exit)
 entities = [exit, player]
+
 
 # Initialize the root console in a context.
 with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
@@ -53,7 +62,8 @@ with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
         map.con().blit(console)
         
         for en in entities:
-            console.print_(*en.loc(), en.glyph)
+            if map.tiles[en.loc()].visible:
+                console.print_(*en.loc(), en.glyph)
             
         # Test for maze completion
         if player.loc() == exit.loc():
@@ -69,6 +79,7 @@ with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
             if event.type == 'KEYDOWN':
                 if event.sym in MOVEMENT_KEYS:
                     player.loc.move(*MOVEMENT_KEYS[event.sym], map)
+                    map.fov.scan(player.loc())
                 elif event.sym in ACTION_KEYS and player.loc() == exit.loc():
                     map.build()
                     exit.loc.set(*map.exit)
