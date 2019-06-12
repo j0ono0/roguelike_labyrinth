@@ -8,8 +8,8 @@ from entity import Entity
 
 #################
 
-MAP_WIDTH = 25
-MAP_HEIGHT = 25
+MAP_WIDTH = 15
+MAP_HEIGHT = 15
 
 #################
 
@@ -33,12 +33,7 @@ tcod.console_set_custom_font(
     tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
 )
 
-"""
 map = PrimsMaze(MAP_WIDTH, MAP_HEIGHT)
-map.build()
-"""
-
-map = Dungeon(MAP_WIDTH, MAP_HEIGHT)
 map.build()
 
 # Setup player

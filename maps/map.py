@@ -4,6 +4,7 @@ class Tile:
         self.glyph = glyph
         self.blocked = blocked
         self.visible = False
+        self.seen = False
         
 class FieldOfView:
     # Shadowcasting method to calculate visible tiles
@@ -34,6 +35,7 @@ class FieldOfView:
         for k, v in self.parent.tiles.items():
             if k in visible:
                 v.visible = True
+                v.seen = True
             else:
                 v.visible = False
     

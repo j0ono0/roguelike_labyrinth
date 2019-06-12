@@ -1,11 +1,12 @@
 import random
 import tcod
-
+from .map import Tile, FieldOfView
 
 class PrimsMaze():
     def __init__(self, width = 20, height = 20):
         self.width = width
         self.height = height
+        self.fov = FieldOfView(self)
         self.tiles = None
         self.entry = None
         self.exit = None
@@ -42,8 +43,11 @@ class PrimsMaze():
             kx, ky = k or t
             for x in range(min(tx, kx), max(tx, kx) + 1):
                 for y in range(min(ty, ky), max(ty, ky) + 1):
-                    self.tiles[(x, y)].glyph = ' '
+                    self.tiles[(x, y)].glyph = '.'
                     self.tiles[(x, y)].blocked = False
+        
+        # Update fielf of view
+        self.fov.scan(self.entry)
 
     def cardinal_neighbours(self, x, y):
         locs = [(x-2, y), (x+2, y), (x, y-2), (x, y+2)]
@@ -56,15 +60,18 @@ class PrimsMaze():
     def con(self):
         con = tcod.console.Console(self.width, self.height, order='F')
         for k, t in self.tiles.items():
-            con.tiles[k] = (
-                ord(t.glyph),
-                (100, 100, 100, 255),
-                (*tcod.black, 255)
-            )
+            
+            if t.visible:
+                con.tiles[k] = (
+                    ord(t.glyph),
+                    (100, 100, 100, 255),
+                    (27, 27, 27, 255)
+                )
+            elif t.seen:
+                con.tiles[k] = (
+                    ord(t.glyph),
+                    (70, 70, 70, 255),
+                    (*tcod.black, 255)
+                )
         return con
         
-
-class Tile:
-    def __init__(self, glyph='#', blocked=True):
-        self.glyph = glyph
-        self.blocked = blocked
