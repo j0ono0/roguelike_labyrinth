@@ -6,6 +6,7 @@ class PrimsMaze():
     def __init__(self, width = 20, height = 20):
         self.width = width
         self.height = height
+        self.level = 0
         self.fov = FieldOfView(self)
         self.tiles = None
         self.entry = None
@@ -17,6 +18,7 @@ class PrimsMaze():
         return (x, y)
     
     def build(self):
+        self.level += 1
         self.entry = self.exit or self.random_loc()
         self.exit = self.random_loc()
         self.tiles = {(x,y): Tile('#', True) for x in range(self.width) for y in range(self.height)}

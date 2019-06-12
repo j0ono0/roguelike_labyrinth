@@ -3,7 +3,6 @@ import random
 import tcod
 import tcod.event
 from maps.maze import PrimsMaze
-from maps.dungeon import Dungeon
 from entity import Entity
 
 #################
@@ -62,10 +61,11 @@ with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
             
         # Test for maze completion
         if player.loc() == exit.loc():
-            msg = '<space> for next level.'
-            x = (MAP_WIDTH - len(msg)) // 2
-            y = MAP_HEIGHT // 2
-            console.print_(x, y, msg)
+            msg = ['Next level:{}'.format(map.level + 1), '<space>']
+            y = (MAP_HEIGHT - len(msg)) // 2
+            for i, ln in enumerate(msg):
+                x = (MAP_WIDTH - len(ln)) // 2
+                console.print_(x, y + i, ln)
         
         tcod.console_flush()
 
