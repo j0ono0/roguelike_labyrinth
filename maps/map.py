@@ -1,3 +1,65 @@
+import random
+from collections import namedtuple
+import tcod
+from . import maze
+
+Location = namedtuple('Location',['x', 'y'])
+
+class TileMap():
+    def __init__(self, width, height):
+        self.level = 0
+        self.width = width
+        self.height = height
+        self.fov = FieldOfView(self)
+        self.graph = None
+        self.titles = None
+        self.entry = None
+        self.exit = None
+        
+    def random_tile_loc(self):
+        x = random.randrange(0, (self.width))
+        y = random.randrange(0, (self.height))
+        return Location(x, y)
+    
+    def build(self):
+        # Build new graph and clear existing tiles
+        self.graph = maze.build_graph(self.width // 2, self.height // 2)
+        self.tiles = {(x,y): Tile('#', True) for x in range(self.width) for y in range(self.height)}
+        
+        # Update tiles from graph data
+        for loc, edges in self.graph.items():
+            path = [(loc.x * 2, loc.y * 2)]
+            for (x, y) in edges:
+                dx = x - loc.x
+                dy = y - loc.y
+                path.append((loc.x * 2 + dx, loc.y * 2 + dy))
+            for p in path:
+                # offset tiles by +1 to create solid border
+                p = (p[0] + 1, p[1] + 1)
+                self.tiles[p].glyph = '.'
+                self.tiles[p].blocked = False
+        
+        # Place entry and exit on unblocked tiles
+        self.entry = self.exit or [i * 2 + 1 for i in random.choice(list(self.graph.keys()))]
+        self.exit = [i * 2 + 1 for i in random.choice(list(self.graph.keys()))]
+    
+    def con(self):
+        con = tcod.console.Console(self.width, self.height, order='F')
+        for k, t in self.tiles.items():
+            if t.visible:
+                con.tiles[k] = (
+                    ord(t.glyph),
+                    (100, 100, 100, 255),
+                    (27, 27, 27, 255)
+                )
+            elif t.seen:
+                con.tiles[k] = (
+                    ord(t.glyph),
+                    (70, 70, 70, 255),
+                    (*tcod.black, 255)
+                )
+        return con
+
 
 class Tile:
     def __init__(self, glyph='#', blocked=True):
@@ -5,6 +67,7 @@ class Tile:
         self.blocked = blocked
         self.visible = False
         self.seen = False
+        
         
 class FieldOfView:
     # Shadowcasting method to calculate visible tiles

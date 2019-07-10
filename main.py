@@ -2,7 +2,7 @@
 import random
 import tcod
 import tcod.event
-from maps.maze import PrimsMaze
+from maps.map import TileMap
 from entity import Entity
 
 #################
@@ -32,7 +32,7 @@ tcod.console_set_custom_font(
     tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
 )
 
-map = PrimsMaze(MAP_WIDTH, MAP_HEIGHT)
+map = TileMap(MAP_WIDTH, MAP_HEIGHT)
 map.build()
 
 # Setup player
@@ -78,6 +78,7 @@ with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
                 elif event.sym in ACTION_KEYS and player.loc() == exit.loc():
                     map.build()
                     exit.loc.set(*map.exit)
+                    map.fov.scan(player.loc())
 
             if event.type == 'QUIT':
                 # Halt the script using SystemExit
