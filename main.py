@@ -2,7 +2,7 @@
 import random
 import tcod
 import tcod.event
-from maps.map import TileMap
+from maps.map import MazeMap
 from entity import Entity
 
 #################
@@ -32,7 +32,7 @@ tcod.console_set_custom_font(
     tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
 )
 
-map = TileMap(MAP_WIDTH, MAP_HEIGHT)
+map = MazeMap(MAP_WIDTH, MAP_HEIGHT)
 map.build()
 
 # Setup player

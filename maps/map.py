@@ -1,47 +1,27 @@
 import random
+import copy
 from collections import namedtuple
 import tcod
-from . import maze
 
 Location = namedtuple('Location',['x', 'y'])
 
-class TileMap():
+class Map():
     def __init__(self, width, height):
         self.level = 0
         self.width = width
         self.height = height
         self.fov = FieldOfView(self)
-        self.graph = None
-        self.titles = None
+        self.tiles = None
         self.entry = None
         self.exit = None
-        
+    
+    def fill_tiles(self, tile):
+        self.tiles = {(x,y): copy.copy(tile) for x in range(self.width) for y in range(self.height)}
+    
     def random_tile_loc(self):
         x = random.randrange(0, (self.width))
         y = random.randrange(0, (self.height))
         return Location(x, y)
-    
-    def build(self):
-        # Build new graph and clear existing tiles
-        self.graph = maze.build_graph(self.width // 2, self.height // 2)
-        self.tiles = {(x,y): Tile('#', True) for x in range(self.width) for y in range(self.height)}
-        
-        # Update tiles from graph data
-        for loc, edges in self.graph.items():
-            path = [(loc.x * 2, loc.y * 2)]
-            for (x, y) in edges:
-                dx = x - loc.x
-                dy = y - loc.y
-                path.append((loc.x * 2 + dx, loc.y * 2 + dy))
-            for p in path:
-                # offset tiles by +1 to create solid border
-                p = (p[0] + 1, p[1] + 1)
-                self.tiles[p].glyph = '.'
-                self.tiles[p].blocked = False
-        
-        # Place entry and exit on unblocked tiles
-        self.entry = self.exit or [i * 2 + 1 for i in random.choice(list(self.graph.keys()))]
-        self.exit = [i * 2 + 1 for i in random.choice(list(self.graph.keys()))]
     
     def con(self):
         con = tcod.console.Console(self.width, self.height, order='F')
@@ -59,6 +39,60 @@ class TileMap():
                     (*tcod.black, 255)
                 )
         return con
+
+
+class MazeMap(Map):
+    def __init__(self, width, height):
+        super().__init__(width, height)
+    
+    def cardinal_neighbours(self, x, y, x_max, y_max):
+        locs = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
+        while locs:
+            # Return in random order
+            x, y = locs.pop(random.randint(0, len(locs)-1))
+            if 0 <= x < x_max and 0 <= y < y_max:
+                yield Location(x, y) 
+            
+    def build_graph(self, width, height):
+        graph = {}
+        start = Location(random.randrange(0, width), random.randrange(0, height))
+        frontier = set([start])
+        graph[start] = set([start])
+        
+        while frontier:
+            connected = False
+            loc = random.sample(frontier, 1)[0]
+            frontier.remove(loc)
+            for n in self.cardinal_neighbours(*loc, width, height):
+                if n not in graph:
+                    frontier.add(n)
+                elif not connected:
+                    graph[loc] = set([n])
+                    graph[n].add(loc)
+                    connected = True
+        return graph
+
+    def build(self):
+        # Build new graph and clear existing tiles
+        graph = self.build_graph(self.width // 2, self.height // 2)
+        self.fill_tiles(Tile('#', True))
+        
+        # Update tiles from graph data
+        for loc, edges in graph.items():
+            path = [(loc.x * 2, loc.y * 2)]
+            for (x, y) in edges:
+                dx = x - loc.x
+                dy = y - loc.y
+                path.append((loc.x * 2 + dx, loc.y * 2 + dy))
+            for p in path:
+                # offset tiles by +1 to create solid border
+                p = (p[0] + 1, p[1] + 1)
+                self.tiles[p].glyph = '.'
+                self.tiles[p].blocked = False
+        
+        # Place entry and exit on unblocked tiles
+        self.entry = self.exit or [i * 2 + 1 for i in random.choice(list(graph.keys()))]
+        self.exit = [i * 2 + 1 for i in random.choice(list(graph.keys()))]
 
 
 class Tile:
