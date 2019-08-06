@@ -4,6 +4,7 @@ import tcod
 import tcod.event
 from maps.map import MazeMap
 from entity import Entity
+from pathfinding import astar_path
 
 #################
 
@@ -47,6 +48,13 @@ exit = Entity('Exit', '>')
 exit.loc.set(*map.exit)
 entities = [exit, player]
 
+# Pathfinding demo
+def path_to_exit():
+    start = player.loc()
+    end = exit.loc()
+    return astar_path(map.tiles, start, end)
+
+
 
 # Initialize the root console in a context.
 with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
@@ -54,6 +62,11 @@ with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
         # Update console and render.
         console.clear()
         map.con().blit(console)
+        
+        # Print pathfinding
+        color = [100,40,40]
+        for loc in path_to_exit():
+            console.print(*loc, '+', color)
         
         for en in entities:
             if map.tiles[en.loc()].visible:
