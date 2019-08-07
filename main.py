@@ -4,7 +4,7 @@ import tcod
 import tcod.event
 from maps.map import MazeMap
 from entity import Entity
-from pathfinding import astar_path
+from pathfinding import astar
 
 #################
 
@@ -52,7 +52,7 @@ entities = [exit, player]
 def path_to_exit():
     start = player.loc()
     end = exit.loc()
-    return astar_path(map.tiles, start, end)
+    return astar(map.tiles, start, end)
 
 
 

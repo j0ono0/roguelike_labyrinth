@@ -1,6 +1,5 @@
 import heapq
 import math
-from collections import deque
 
 def distance(start, end, manhattan=False):
         sx, sy = start
@@ -10,24 +9,10 @@ def distance(start, end, manhattan=False):
         else:
             return math.sqrt((ey - sy)**2 + (ex - sx)**2)
 
-def cardinal_neighbours(graph, x, y):
-        locs = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
-        while locs:
-            loc = locs.pop()
-            if loc in graph and not graph[loc].blocked:
-                yield loc
-
+def cardinal_neighbours(x, y):
+        return [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
     
-def neighbours(graph, id):
-    (x, y) = id
-    n = []
-    for dx in range(x-1, x+2):
-        for dy in range(y-1, y+2):
-            if graph[(dx, dy)] and graph[(dx, dy)].blocked == False and (dx, dy) != id:
-                n.append((dx, dy))
-    return n
-    
-def astar_path(graph, start, end):
+def astar(graph, start, end):
     # Algorith starts at destination and works backwards to find current location
     frontier = []
     # Items are tuple: (<priority>, <location>)
@@ -47,7 +32,9 @@ def astar_path(graph, start, end):
             #path.append(start)
             return path
 
-        for next in cardinal_neighbours(graph, *current):
+        for next in cardinal_neighbours(*current):
+            if next not in graph or graph[next].blocked:
+                continue
             priority = cost_tally[current] + distance(end, next)
             if next not in visited or priority < cost_tally[next]:
                 cost_tally[next] = priority
