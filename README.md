@@ -13,6 +13,11 @@ Recursive shadow casting is used to calculate field of view. Finding the popular
 + [Roguebasin](http://www.roguebasin.com/index.php?title=FOV_using_recursive_shadowcasting)
 + [adammil.net](http://www.adammil.net/blog/v125_Roguelike_Vision_Algorithms.html#intro)
 
+## Path-finding
+A* (A-star) algorithm has been used to find a path from the player to the exit. It recalculates every move displaying a dynamic and up-to-date 'breadcrumb trail'. Current implemetation demonstrates its function (somewhat ruining the challenge of solving the maze). Incorporating a legitimate use is on my 'to do' list. Red Blob Games website was instrumental in gaining an understanding of how a variety of related path-finding algorithms operate.
+
++ [Red Blob Games](https://www.redblobgames.com/pathfinding/a-star/introduction.html)
+
 ## Further Development
 
 ### The initial goals of this project
@@ -23,4 +28,5 @@ Recursive shadow casting is used to calculate field of view. Finding the popular
 
 ### Further potential features:
 
-+ Path finding using A* and Dijkstra algorithms
++ More path-finding variations
++ Utilise pathfinding as a game feature
