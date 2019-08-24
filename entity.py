@@ -5,16 +5,18 @@
 ###########################################################
 from collections import namedtuple
 
-
 class Entity:
-    def __init__(self, name, glyph):
+    def __init__(self, name, glyph, loc=None):
         self.name = name
         self.glyph = glyph
         self.loc = Location()
+        self.action = None
     
     def __str__(self):
         return self.name
 
+    def use(self, tool):
+        tool(self)
 
 class Location:
     def __init__(self, x=0, y=0):

@@ -6,15 +6,19 @@ import tcod
 Location = namedtuple('Location',['x', 'y'])
 
 class Map():
-    def __init__(self, width, height):
-        self.level = 0
+    def __init__(self, width, height, entry=None, id=0):
+        self.id = id
         self.width = width
         self.height = height
         self.fov = FieldOfView(self)
         self.tiles = None
-        self.entry = None
+        self.entry = entry
         self.exit = None
+        self.entities = []
     
+    def random_unblocked_loc(self):
+        return random.choice([k for k, v in self.tiles.items() if not v.blocked])
+
     def fill_tiles(self, tile):
         self.tiles = {(x,y): copy.copy(tile) for x in range(self.width) for y in range(self.height)}
     
@@ -42,10 +46,12 @@ class Map():
 
 
 class MazeMap(Map):
-    def __init__(self, width, height):
-        super().__init__(width, height)
+    def __init__(self, width, height, entry=None, id=0):
+        super().__init__(width, height, entry, id)
+        self.build()
     
-    def cardinal_neighbours(self, x, y, x_max, y_max):
+    def cardinal_neighbours(self, loc, x_max, y_max):
+        x, y = loc
         locs = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
         while locs:
             # Return in random order
@@ -54,8 +60,9 @@ class MazeMap(Map):
                 yield Location(x, y) 
             
     def build_graph(self, width, height):
+        sx, sy = self.random_tile_loc()
+        start = Location(sx // 2, sy // 2)
         graph = {}
-        start = Location(random.randrange(0, width), random.randrange(0, height))
         frontier = set([start])
         graph[start] = set([start])
         
@@ -63,7 +70,7 @@ class MazeMap(Map):
             connected = False
             loc = random.sample(frontier, 1)[0]
             frontier.remove(loc)
-            for n in self.cardinal_neighbours(*loc, width, height):
+            for n in self.cardinal_neighbours(loc, width, height):
                 if n not in graph:
                     frontier.add(n)
                 elif not connected:
@@ -91,8 +98,8 @@ class MazeMap(Map):
                 self.tiles[p].blocked = False
         
         # Place entry and exit on unblocked tiles
-        self.entry = self.exit or [i * 2 + 1 for i in random.choice(list(graph.keys()))]
-        self.exit = [i * 2 + 1 for i in random.choice(list(graph.keys()))]
+        self.entry = self.entry or self.random_unblocked_loc()
+        self.exit = self.random_unblocked_loc()
 
 
 class Tile:

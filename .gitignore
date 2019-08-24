@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# game specific data (save games etc)
+gamedata/
+
+# Editor config
+.vscode/

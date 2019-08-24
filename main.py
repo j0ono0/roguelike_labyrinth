@@ -2,16 +2,11 @@
 import random
 import tcod
 import tcod.event
-from maps.map import MazeMap
 from entity import Entity
 from pathfinding import astar
+import level_handler as lvl
+import actions
 
-#################
-
-MAP_WIDTH = 15
-MAP_HEIGHT = 15
-
-#################
 
 # Create a dictionary that maps keys to vectors.
 # Names of the available keys can be found in the online documentation:
@@ -33,65 +28,85 @@ tcod.console_set_custom_font(
     tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
 )
 
-map = MazeMap(MAP_WIDTH, MAP_HEIGHT)
-map.build()
+# Create first environment
+lvl.create()
+
+# Setup exits
+exit = Entity('Exit', '>')
+exit.loc.set(*lvl.env.exit)
+exit.action = actions.RelocateUser(exit.loc(), lvl.env.id + 1)
+
+entry = Entity('Entry', '<')
+entry.loc.set(*lvl.env.entry)
+entry.action = actions.RelocateUser(entry.loc(), lvl.env.id - 1)
+
+lvl.env.entities = [entry, exit]
+
 
 # Setup player
 player = Entity('Player_01', '@')
-player.loc.set(*map.entry)
+player.loc.set(*lvl.env.entry)
 
-# Update map with player fov
-map.fov.scan(player.loc())
+# Update environment with player fov
+lvl.env.fov.scan(player.loc())
 
-# Setup exit
-exit = Entity('Exit', '>')
-exit.loc.set(*map.exit)
-entities = [exit, player]
 
 # Pathfinding demo
-def path_to_exit():
+def path_to_loc(loc):
     start = player.loc()
-    end = exit.loc()
-    return astar(map.tiles, start, end)
-
+    return astar(lvl.env.tiles, start, loc)
 
 
 # Initialize the root console in a context.
-with tcod.console_init_root(MAP_WIDTH, MAP_HEIGHT, order="F") as console:
+with tcod.console_init_root(lvl.MAP_WIDTH, lvl.MAP_HEIGHT, order="F") as console:
     while True:
         # Update console and render.
         console.clear()
-        map.con().blit(console)
+        lvl.env.con().blit(console)
         
         # Print pathfinding
-        color = [100,40,40]
-        for loc in path_to_exit():
+        color = [200,40,40]
+        for loc in path_to_loc(lvl.env.exit):
             console.print(*loc, '+', color)
+
+        color = [60,255,100]
+        for loc in path_to_loc(lvl.env.entry):
+            console.print(*loc, '-', color)
         
-        for en in entities:
-            if map.tiles[en.loc()].visible:
+        for en in lvl.env.entities:
+            if lvl.env.tiles[en.loc()].visible:
                 console.print_(*en.loc(), en.glyph)
+        
+        console.print_(*player.loc(), player.glyph)
             
         # Test for maze completion
-        if player.loc() == exit.loc():
-            msg = ['Next level:{}'.format(map.level + 1), '<space>']
-            y = (MAP_HEIGHT - len(msg)) // 2
+        msg = None
+        if player.loc() == lvl.env.exit:
+            msg = ['Next level:{}'.format(lvl.env.id + 1), '<space>']
+        elif player.loc() == lvl.env.entry:
+            msg = ['Prev level:{}'.format(lvl.env.id - 1), '<space>']
+        if msg:
+            y = (lvl.MAP_HEIGHT - len(msg)) // 2
             for i, ln in enumerate(msg):
-                x = (MAP_WIDTH - len(ln)) // 2
+                x = (lvl.MAP_WIDTH - len(ln)) // 2
                 console.print_(x, y + i, ln)
+            
         
         tcod.console_flush()
 
         # User input
         for event in tcod.event.wait():
             if event.type == 'KEYDOWN':
+
                 if event.sym in MOVEMENT_KEYS:
-                    player.loc.move(*MOVEMENT_KEYS[event.sym], map)
-                    map.fov.scan(player.loc())
-                elif event.sym in ACTION_KEYS and player.loc() == exit.loc():
-                    map.build()
-                    exit.loc.set(*map.exit)
-                    map.fov.scan(player.loc())
+                    player.loc.move(*MOVEMENT_KEYS[event.sym], lvl.env)
+                    lvl.env.fov.scan(player.loc())
+
+                elif event.sym in ACTION_KEYS:
+                    item = [e for e in lvl.env.entities if e.loc() == player.loc()][0]
+                    #Player uses item at location
+                    player.use(item.action)
+                    
 
             if event.type == 'QUIT':
                 # Halt the script using SystemExit
