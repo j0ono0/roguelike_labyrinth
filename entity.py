@@ -6,17 +6,17 @@
 from collections import namedtuple
 
 class Entity:
-    def __init__(self, name, glyph, loc=None):
+    def __init__(self, name, glyph, loc=(0,0), action=None):
         self.name = name
         self.glyph = glyph
-        self.loc = Location()
-        self.action = None
+        self.loc = Location(*loc)
+        self.action = action
     
     def __str__(self):
         return self.name
 
     def use(self, tool):
-        tool(self)
+        tool.action(self)
 
 class Location:
     def __init__(self, x=0, y=0):
@@ -35,3 +35,4 @@ class Location:
         if not map.tiles[loc].blocked:
             self.x = loc[0]
             self.y = loc[1]
+

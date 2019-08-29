@@ -6,7 +6,7 @@ from entity import Entity
 from pathfinding import astar
 import level_handler as lvl
 import actions
-
+from settings import *
 
 # Create a dictionary that maps keys to vectors.
 # Names of the available keys can be found in the online documentation:
@@ -27,71 +27,56 @@ tcod.console_set_custom_font(
     "arial10x10.png",
     tcod.FONT_LAYOUT_TCOD | tcod.FONT_TYPE_GREYSCALE,
 )
+# Delete existing saved levels
+lvl.delete_all()
 
 # Create first environment
-lvl.create()
-
-# Setup exits
-exit = Entity('Exit', '>')
-exit.loc.set(*lvl.env.exit)
-exit.action = actions.RelocateUser(exit.loc(), lvl.env.id + 1)
-
-entry = Entity('Entry', '<')
-entry.loc.set(*lvl.env.entry)
-entry.action = actions.RelocateUser(entry.loc(), lvl.env.id - 1)
-
-lvl.env.entities = [entry, exit]
+print('Creating starting level')
+lvl.create(MAP_WIDTH, MAP_HEIGHT)
+actions.add_exit(lvl.env.random_unblocked_loc(), 2)
 
 
 # Setup player
 player = Entity('Player_01', '@')
-player.loc.set(*lvl.env.entry)
+player.loc.set(*lvl.env.random_unblocked_loc())
 
-# Update environment with player fov
+# Update environment with player placed
 lvl.env.fov.scan(player.loc())
-
 
 # Pathfinding demo
 def path_to_loc(loc):
     start = player.loc()
     return astar(lvl.env.tiles, start, loc)
 
-
 # Initialize the root console in a context.
-with tcod.console_init_root(lvl.MAP_WIDTH, lvl.MAP_HEIGHT, order="F") as console:
+with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
     while True:
         # Update console and render.
         console.clear()
-        lvl.env.con().blit(console)
+        lvl_con = lvl.env.con()
         
         # Print pathfinding
-        color = [200,40,40]
-        for loc in path_to_loc(lvl.env.exit):
-            console.print(*loc, '+', color)
-
-        color = [60,255,100]
-        for loc in path_to_loc(lvl.env.entry):
-            console.print(*loc, '-', color)
+        exits = lvl.exits()
+        for ex in lvl.exits():
+            if ex.action.dest_id >= lvl.env.id:
+                color = [60,255,100]
+                glyph = '+'
+            else:
+                color = [255,100,100]
+                glyph = '-'
+            for loc in path_to_loc(ex.loc()):
+                lvl_con.print(*loc, glyph, color)
         
+        # Print entities list
         for en in lvl.env.entities:
             if lvl.env.tiles[en.loc()].visible:
-                console.print_(*en.loc(), en.glyph)
+                
+                lvl_con.print_(*en.loc(), en.glyph)
         
-        console.print_(*player.loc(), player.glyph)
-            
-        # Test for maze completion
-        msg = None
-        if player.loc() == lvl.env.exit:
-            msg = ['Next level:{}'.format(lvl.env.id + 1), '<space>']
-        elif player.loc() == lvl.env.entry:
-            msg = ['Prev level:{}'.format(lvl.env.id - 1), '<space>']
-        if msg:
-            y = (lvl.MAP_HEIGHT - len(msg)) // 2
-            for i, ln in enumerate(msg):
-                x = (lvl.MAP_WIDTH - len(ln)) // 2
-                console.print_(x, y + i, ln)
-            
+        lvl_con.print_(*player.loc(), player.glyph)
         
+        console.print_frame(0, 0, MAP_WIDTH + 2, MAP_HEIGHT + 2)
+        lvl_con.blit(console, *MAP_OFFSET)
         tcod.console_flush()
 
         # User input
@@ -99,13 +84,15 @@ with tcod.console_init_root(lvl.MAP_WIDTH, lvl.MAP_HEIGHT, order="F") as console
             if event.type == 'KEYDOWN':
 
                 if event.sym in MOVEMENT_KEYS:
-                    player.loc.move(*MOVEMENT_KEYS[event.sym], lvl.env)
-                    lvl.env.fov.scan(player.loc())
-
+                    try:
+                        player.loc.move(*MOVEMENT_KEYS[event.sym], lvl.env)
+                        lvl.env.fov.scan(player.loc())
+                    except KeyError as e:
+                        print('That way appears blocked!')
                 elif event.sym in ACTION_KEYS:
                     item = [e for e in lvl.env.entities if e.loc() == player.loc()][0]
                     #Player uses item at location
-                    player.use(item.action)
+                    player.use(item)
                     
 
             if event.type == 'QUIT':

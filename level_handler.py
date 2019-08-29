@@ -3,25 +3,19 @@ from levels import environment
 from entity import Entity
 
 #################
-# Constants
-MAP_WIDTH = 15
-MAP_HEIGHT = 15
-
-#################
 # Module variables
+lvl_prefix = 'env_'
 env = None
 
 #################
 
-def change(id):
-    save()
-    try:
-        load(id)
-    except FileNotFoundError:
-        print('Level not found. Creating new level')
-        create()
+def delete_all():
+    levels = [n for n in os.listdir('gamedata') if n[:len(lvl_prefix)] == lvl_prefix]
+    for filename in levels:
+        path = os.path.join('gamedata', filename)
+        os.remove(path)
 
-def create():
+def create(width, height):
     global env
     #find highest id in gamedata
     filenames = os.listdir('gamedata')
@@ -30,18 +24,21 @@ def create():
     try:
         newid = max(ids) + 1
     except ValueError:
-        newid = 0
-    env = environment.MazeMap(MAP_WIDTH, MAP_HEIGHT, id=newid)
+        newid = 1
+    env = environment.MazeMap(width, height, id=newid)
 
 def load(id):
     global env
-    filepath = os.path.join('gamedata', f'env_{id}.pickle')
+    filepath = os.path.join('gamedata', f'{lvl_prefix}{id}.pickle')
     with open(filepath, 'rb') as f:
         env = pickle.load(f)
     
 def save():
-    filepath = os.path.join('gamedata', f'env_{env.id}.pickle')
+    filepath = os.path.join('gamedata', f'{lvl_prefix}{env.id}.pickle')
     with open(filepath, 'wb') as f:
         pickle.dump(env, f)
     print(f'enviroment for level {env.id} saved.')
     
+def exits():
+    lst = [e for e in env.entities if e.glyph in ['<','>'] and e.action.dest_id]
+    return sorted(lst, key = lambda e: e.action.dest_id)

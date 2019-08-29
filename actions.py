@@ -3,6 +3,19 @@
 ##########################
 import level_handler as lvl 
 from entity import Entity
+from settings import *
+
+
+def add_exit(loc=None, id=None):
+    loc = loc or lvl.env.random_unblocked_loc()
+    id = id or lvl.env.id
+    if id >= lvl.env.id:
+        glyph = '>'
+        label = 'Exit down'
+    else:
+        glyph = '<'
+        label = 'Exit up'
+    lvl.env.entities.append(Entity(label, glyph, loc, RelocateUser(loc, id)))
 
 class RelocateUser:
     def __init__(self, loc, dest_id):
@@ -12,17 +25,13 @@ class RelocateUser:
     def __call__(self, user):
         print('relocation triggered.')
         user.loc.set(*self.loc)
-        lvl.change(self.dest_id)
-        # Update entry/exit
-        lvl.env.entry = self.loc
-        lvl.env.exit = lvl.env.random_unblocked_loc()
-
-        exit = Entity('Exit', '>')
-        exit.loc.set(*lvl.env.exit)
-        exit.action = RelocateUser(exit.loc(), self.dest_id + 1)
-
-        entry = Entity('Entry', '<')
-        entry.loc.set(*self.loc)
-        entry.action = RelocateUser(entry.loc(), self.dest_id - 1)
-        lvl.env.entities = [entry, exit]
-        lvl.env.fov.scan(self.loc)
+        lvl.save()
+        try:
+            lvl.load(self.dest_id)
+            print(f'level {lvl.env.id} loaded')
+        except FileNotFoundError:
+            print('Level not found. Creating new level')
+            lvl.create(MAP_WIDTH, MAP_HEIGHT)
+            add_exit(self.loc, self.dest_id - 1)
+            add_exit(lvl.env.random_unblocked_loc(), self.dest_id + 1)
+        lvl.env.fov.scan(user.loc())

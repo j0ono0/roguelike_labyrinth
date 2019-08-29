@@ -12,8 +12,6 @@ class Map():
         self.height = height
         self.fov = FieldOfView(self)
         self.tiles = None
-        self.entry = entry
-        self.exit = None
         self.entities = []
     
     def random_unblocked_loc(self):
@@ -44,12 +42,17 @@ class Map():
                 )
         return con
 
-
 class MazeMap(Map):
     def __init__(self, width, height, entry=None, id=0):
         super().__init__(width, height, entry, id)
         self.build()
     
+    def random_unblocked_loc(self):
+        # Select from only even x/y tiles locations
+        # ensures location will be unblocked on new levels
+        [(x*2, y*2) for x in range(self.width//2) for y in range(self.height//2)]
+        return random.choice([(x*2, y*2) for x in range(self.width//2) for y in range(self.height//2)])
+
     def cardinal_neighbours(self, loc, x_max, y_max):
         x, y = loc
         locs = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
@@ -58,7 +61,7 @@ class MazeMap(Map):
             x, y = locs.pop(random.randint(0, len(locs)-1))
             if 0 <= x < x_max and 0 <= y < y_max:
                 yield Location(x, y) 
-            
+
     def build_graph(self, width, height):
         sx, sy = self.random_tile_loc()
         start = Location(sx // 2, sy // 2)
@@ -71,12 +74,13 @@ class MazeMap(Map):
             loc = random.sample(frontier, 1)[0]
             frontier.remove(loc)
             for n in self.cardinal_neighbours(loc, width, height):
-                if n not in graph:
-                    frontier.add(n)
-                elif not connected:
+                if n in graph and not connected:
                     graph[loc] = set([n])
                     graph[n].add(loc)
                     connected = True
+                elif n not in graph and n not in frontier:
+                    frontier.add(n)
+
         return graph
 
     def build(self):
@@ -93,14 +97,9 @@ class MazeMap(Map):
                 path.append((loc.x * 2 + dx, loc.y * 2 + dy))
             for p in path:
                 # offset tiles by +1 to create solid border
-                p = (p[0] + 1, p[1] + 1)
+                p = (p[0], p[1])
                 self.tiles[p].glyph = '.'
                 self.tiles[p].blocked = False
-        
-        # Place entry and exit on unblocked tiles
-        self.entry = self.entry or self.random_unblocked_loc()
-        self.exit = self.random_unblocked_loc()
-
 
 class Tile:
     def __init__(self, glyph='#', blocked=True):
