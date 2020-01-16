@@ -66,18 +66,20 @@ class MazeMap(Map):
         start = Location(sx // 2, sy // 2)
         graph = {}
         frontier = set([start])
+        visited = set()
         graph[start] = set([start])
         
         while frontier:
             connected = False
             loc = random.sample(frontier, 1)[0]
+            visited.add(loc)
             frontier.remove(loc)
             for n in self.cardinal_neighbours(loc, width, height):
                 if n in graph and not connected:
                     graph[loc] = set([n])
                     graph[n].add(loc)
                     connected = True
-                if n not in graph:
+                if n not in visited:
                     frontier.add(n)
 
         return graph
