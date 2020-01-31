@@ -1,6 +1,7 @@
 import os, pickle, re
 from levels import environment
 from entity import Entity
+from settings import *
 
 #################
 # Module variables
@@ -42,3 +43,35 @@ def save():
 def exits():
     lst = [e for e in env.entities if e.glyph in ['<','>'] and e.action.dest_id]
     return sorted(lst, key = lambda e: e.action.dest_id)
+
+def add_exit(loc=None, id=None):
+    global env
+    loc = loc or env.random_empty_loc()
+    id = id or env.id
+    if id >= env.id:
+        glyph = '>'
+        label = 'Exit down'
+    else:
+        glyph = '<'
+        label = 'Exit up'
+    env.entities.append(Entity(label, glyph, loc, RelocateUser(loc, id)))
+
+class RelocateUser:
+    global env
+    def __init__(self, loc, dest_id):
+        self.loc = loc
+        self.dest_id = dest_id
+
+    def __call__(self, user):
+        print('relocation triggered.')
+        user.loc.set(*self.loc)
+        save()
+        try:
+            load(self.dest_id)
+            print(f'level {env.id} loaded')
+        except FileNotFoundError:
+            print('Level not found. Creating new level')
+            create(MAP_WIDTH, MAP_HEIGHT)
+            add_exit(self.loc, self.dest_id - 1)
+            add_exit(env.random_empty_loc(), self.dest_id + 1)
+        env.fov.scan(user.loc())

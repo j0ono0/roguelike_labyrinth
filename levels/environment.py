@@ -14,6 +14,10 @@ class Map():
         self.tiles = None
         self.entities = []
     
+    def random_empty_loc(self):
+        entity_locs = [e.loc for  e in self.entities]
+        return random.choice([k for k, v in self.tiles.items() if not v.blocked and k not in entity_locs])
+
     def random_unblocked_loc(self):
         return random.choice([k for k, v in self.tiles.items() if not v.blocked])
 

@@ -5,7 +5,6 @@ import tcod.event
 from entity import Entity
 from pathfinding import astar
 import level_handler as lvl
-import actions
 from settings import *
 
 # Create a dictionary that maps keys to vectors.
@@ -33,8 +32,7 @@ lvl.delete_all()
 # Create first environment
 print('Creating starting level')
 lvl.create(MAP_WIDTH, MAP_HEIGHT)
-actions.add_exit(lvl.env.random_unblocked_loc(), 2)
-
+lvl.add_exit(lvl.env.random_unblocked_loc(), 2)
 
 # Setup player
 player = Entity('Player_01', '@')
