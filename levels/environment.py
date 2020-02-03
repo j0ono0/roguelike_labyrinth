@@ -90,7 +90,7 @@ class MazeMap(Map):
 
     def build(self):
         # Build new graph and clear existing tiles
-        graph = self.build_graph(self.width // 2, self.height // 2)
+        graph = self.build_graph((self.width-1) // 2, (self.height-1) // 2)
         self.fill_tiles(Tile('#', True))
         
         # Update tiles from graph data

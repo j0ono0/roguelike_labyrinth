@@ -73,7 +73,7 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
         
         lvl_con.print_(*player.loc(), player.glyph)
         
-        console.print_frame(0, 0, MAP_WIDTH + 2, MAP_HEIGHT + 2)
+        #console.print_frame(0, 0, MAP_WIDTH + 2, MAP_HEIGHT + 2)
         lvl_con.blit(console, *MAP_OFFSET)
         tcod.console_flush()
 
