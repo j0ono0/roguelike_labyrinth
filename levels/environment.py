@@ -146,6 +146,7 @@ class FieldOfView:
                 v.seen = True
             else:
                 v.visible = False
+                v.visible = True
     
     def scan_octant(self, source, start = 0, end = 1, distance = 0, transform = [1, 1, 0, 0]):
         xx, yy, xy, yx = transform
