@@ -11,11 +11,13 @@ env = None
 
 #################
 
+
 def delete_all():
     levels = [n for n in os.listdir('gamedata') if n[:len(lvl_prefix)] == lvl_prefix]
     for filename in levels:
         path = os.path.join('gamedata', filename)
         os.remove(path)
+
 
 def create(width, height):
     global env
@@ -29,21 +31,25 @@ def create(width, height):
         newid = 1
     env = environment.MazeMap(width, height, id=newid)
 
+
 def load(id):
     global env
     filepath = os.path.join('gamedata', f'{lvl_prefix}{id}.pickle')
     with open(filepath, 'rb') as f:
         env = pickle.load(f)
     
+
 def save():
     filepath = os.path.join('gamedata', f'{lvl_prefix}{env.id}.pickle')
     with open(filepath, 'wb') as f:
         pickle.dump(env, f)
     print(f'enviroment for level {env.id} saved.')
     
+
 def exits():
     lst = [e for e in env.entities if e.glyph in ['<','>'] and e.action.dest_id]
     return sorted(lst, key = lambda e: e.action.dest_id)
+
 
 def add_exit(loc=None, id=None):
     global env
@@ -57,6 +63,7 @@ def add_exit(loc=None, id=None):
         label = 'Exit up'
     env.entities.append(Entity(label, glyph, loc, RelocateUser(loc, id)))
 
+
 def update_fov(loc):
     vismap = {k: t.blocked==False for (k, t) in env.tiles.items()}
     vis_tiles = fov.scan(loc, vismap, 16)
@@ -67,6 +74,9 @@ def update_fov(loc):
         else:
             v.visible = False
 
+def update_entity_fov(e):
+    vismap = {k: t.blocked==False for (k, t) in env.tiles.items()}
+    e.fov = fov.scan(e.loc(), vismap, e.fov_max)
 
 class RelocateUser:
     global env

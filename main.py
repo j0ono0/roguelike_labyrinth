@@ -53,6 +53,12 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
         console.clear()
         lvl_con = lvl.env.con()
         
+        # Render player fov
+        for loc in player.fov:
+            glyph = lvl.env.tiles[loc].glyph
+            color = [120, 120, 120]
+            lvl_con.print(*loc, glyph, color)
+
         # Print pathfinding
         exits = lvl.exits()
         for ex in lvl.exits():
@@ -67,8 +73,7 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
         
         # Print entities list
         for en in lvl.env.entities:
-            if lvl.env.tiles[en.loc()].visible:
-                
+            if en.loc() in player.fov:
                 lvl_con.print_(*en.loc(), en.glyph)
         
         lvl_con.print_(*player.loc(), player.glyph)
@@ -85,6 +90,7 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
                     try:
                         player.loc.move(*MOVEMENT_KEYS[event.sym], lvl.env)
                         lvl.update_fov(player.loc())
+                        lvl.update_entity_fov(player)
                         
                     except KeyError as e:
                         print('That way appears blocked!')

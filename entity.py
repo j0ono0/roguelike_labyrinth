@@ -10,6 +10,8 @@ class Entity:
         self.name = name
         self.glyph = glyph
         self.loc = Location(*loc)
+        self.fov = []
+        self.fov_max = 16
         self.action = action
     
     def __str__(self):

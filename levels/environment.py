@@ -31,16 +31,10 @@ class Map():
     def con(self):
         con = tcod.console.Console(self.width, self.height, order='F')
         for k, t in self.tiles.items():
-            if t.visible:
+            if t.seen:
                 con.tiles[k] = (
                     ord(t.glyph),
-                    (100, 100, 100, 255),
-                    (27, 27, 27, 255)
-                )
-            elif t.seen:
-                con.tiles[k] = (
-                    ord(t.glyph),
-                    (70, 70, 70, 255),
+                    (60, 60, 60, 255),
                     (*tcod.black, 255)
                 )
         return con
