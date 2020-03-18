@@ -39,7 +39,7 @@ player = Entity('Player_01', '@')
 player.loc.set(*lvl.env.random_unblocked_loc())
 
 # Update environment with player placed
-lvl.env.fov.scan(player.loc())
+lvl.update_fov(player.loc())
 
 # Pathfinding demo
 def path_to_loc(loc):
@@ -84,7 +84,8 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
                 if event.sym in MOVEMENT_KEYS:
                     try:
                         player.loc.move(*MOVEMENT_KEYS[event.sym], lvl.env)
-                        lvl.env.fov.scan(player.loc())
+                        lvl.update_fov(player.loc())
+                        
                     except KeyError as e:
                         print('That way appears blocked!')
                 elif event.sym in ACTION_KEYS:

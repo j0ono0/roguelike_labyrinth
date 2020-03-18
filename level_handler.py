@@ -1,6 +1,7 @@
 import os, pickle, re
 from levels import environment
 from entity import Entity
+from levels import field_of_view as fov 
 from settings import *
 
 #################
@@ -56,6 +57,17 @@ def add_exit(loc=None, id=None):
         label = 'Exit up'
     env.entities.append(Entity(label, glyph, loc, RelocateUser(loc, id)))
 
+def update_fov(loc):
+    vismap = {k: t.blocked==False for (k, t) in env.tiles.items()}
+    vis_tiles = fov.scan(loc, vismap, 16)
+    for k, v in env.tiles.items():
+        if k in vis_tiles:
+            v.visible = True
+            v.seen = True
+        else:
+            v.visible = False
+
+
 class RelocateUser:
     global env
     def __init__(self, loc, dest_id):
@@ -74,4 +86,4 @@ class RelocateUser:
             create(MAP_WIDTH, MAP_HEIGHT)
             add_exit(self.loc, self.dest_id - 1)
             add_exit(env.random_empty_loc(), self.dest_id + 1)
-        env.fov.scan(user.loc())
+        update_fov(user.loc())
