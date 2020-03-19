@@ -45,9 +45,9 @@ class MazeMap(Map):
         self.build()
     
     def random_unblocked_loc(self):
-        # Select from only odd x/y tiles locations
+        # Select from only even x/y tiles locations
         # ensures location will be unblocked on new maze levels
-        return random.choice([(x * 2 + 1, y * 2 + 1) for x in range(self.width//2) for y in range(self.height//2)])
+        return random.choice([(x * 2, y * 2) for x in range(self.width//2) for y in range(self.height//2)])
 
     def cardinal_neighbours(self, loc, x_max, y_max):
         x, y = loc
@@ -82,8 +82,10 @@ class MazeMap(Map):
         return graph
 
     def build(self):
+        if self.width % 2 == 0 or self.height % 2 == 0:
+            raise ValueError('mazeMap must be odd width and height.')
         # Build new graph and clear existing tiles
-        graph = self.build_graph((self.width-1) // 2, (self.height-1) // 2)
+        graph = self.build_graph((self.width // 2) + 1, (self.height // 2) + 1)
         self.fill_tiles(Tile('#', True))
         
         # Update tiles from graph data
@@ -93,9 +95,10 @@ class MazeMap(Map):
                 dx = x - loc.x
                 dy = y - loc.y
                 path.append((loc.x * 2 + dx, loc.y * 2 + dy))
+                
             for p in path:
                 # offset tiles by +1 to create solid border
-                p = (p[0] + 1, p[1] + 1)
+                #p = (p[0] + 1, p[1] + 1)
                 self.tiles[p].glyph = '.'
                 self.tiles[p].blocked = False
 

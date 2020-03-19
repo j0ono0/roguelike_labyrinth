@@ -64,15 +64,10 @@ def add_exit(loc=None, id=None):
     env.entities.append(Entity(label, glyph, loc, RelocateUser(loc, id)))
 
 
-def update_fov(loc):
-    vismap = {k: t.blocked==False for (k, t) in env.tiles.items()}
-    vis_tiles = fov.scan(loc, vismap, 16)
-    for k, v in env.tiles.items():
-        if k in vis_tiles:
-            v.visible = True
-            v.seen = True
-        else:
-            v.visible = False
+def update_seen(vismap):
+    for loc in vismap:
+        env.tiles[loc].seen = True
+
 
 def update_entity_fov(e):
     vismap = {k: t.blocked==False for (k, t) in env.tiles.items()}
@@ -96,4 +91,3 @@ class RelocateUser:
             create(MAP_WIDTH, MAP_HEIGHT)
             add_exit(self.loc, self.dest_id - 1)
             add_exit(env.random_empty_loc(), self.dest_id + 1)
-        update_fov(user.loc())
