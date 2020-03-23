@@ -3,7 +3,6 @@ import random
 import tcod
 import tcod.event
 from entity import Entity
-from pathfinding import astar
 import level_handler as lvl
 from settings import *
 
@@ -32,34 +31,22 @@ lvl.delete_all()
 # Create first environment
 print('Creating starting level')
 lvl.create(MAP_WIDTH, MAP_HEIGHT)
-lvl.add_exit(lvl.env.random_unblocked_loc(), 2)
 
 # Setup player
 player = Entity('Player_01', '@')
 player.loc.set(*lvl.env.random_unblocked_loc())
 
 # Update players field of view
-lvl.update_entity_fov(player)
+player.update_fov(lvl.env.fov_array())
 lvl.update_seen(player.fov)
-
-# Pathfinding demo
-def path_to_loc(loc):
-    start = player.loc()
-    return astar(lvl.env.tiles, start, loc)
 
 # Initialize the root console in a context.
 with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
     while True:
         # Update console and render.
         console.clear()
-        lvl_con = lvl.env.con()
+        lvl_con = lvl.render(player.fov)
         
-        # Render player fov
-        for loc in player.fov:
-            glyph = lvl.env.tiles[loc].glyph
-            color = [120, 120, 120]
-            lvl_con.print(*loc, glyph, color)
-
         # Print pathfinding
         exits = lvl.exits()
         for ex in lvl.exits():
@@ -69,14 +56,10 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
             else:
                 color = [255,100,100]
                 glyph = '-'
-            for loc in path_to_loc(ex.loc()):
+            
+            for loc in lvl.find_path(player.loc(), ex.loc())[1:]:
                 lvl_con.print(*loc, glyph, color)
-        
-        # Print entities list
-        for en in lvl.env.entities:
-            if en.loc() in player.fov:
-                lvl_con.print_(*en.loc(), en.glyph)
-        
+            
         lvl_con.print_(*player.loc(), player.glyph)
         
         console.print_frame(MAP_OFFSET[0] - 1, MAP_OFFSET[1] - 1, MAP_WIDTH + 2, MAP_HEIGHT + 2)
@@ -90,7 +73,7 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
                 if event.sym in MOVEMENT_KEYS:
                     try:
                         player.loc.move(*MOVEMENT_KEYS[event.sym], lvl.env)
-                        lvl.update_entity_fov(player)
+                        player.update_fov(lvl.env.fov_array())
                         lvl.update_seen(player.fov)
                         
                     except KeyError as e:

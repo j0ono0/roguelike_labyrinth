@@ -4,6 +4,7 @@
 #
 ###########################################################
 from collections import namedtuple
+from levels import field_of_view as fov
 
 class Entity:
     def __init__(self, name, glyph, loc=(0,0), action=None):
@@ -19,6 +20,9 @@ class Entity:
 
     def use(self, tool):
         tool.action(self)
+
+    def update_fov(self, fov_array):
+        self.fov = fov.scan(self.loc(), fov_array, self.fov_max)
 
 class Location:
     def __init__(self, x=0, y=0):
@@ -37,4 +41,5 @@ class Location:
         if not map.tiles[loc].blocked:
             self.x = loc[0]
             self.y = loc[1]
+
 

@@ -1,7 +1,6 @@
 import random
 import copy
 from collections import namedtuple
-import tcod
 
 Location = namedtuple('Location',['x', 'y'])
 
@@ -13,6 +12,9 @@ class Map():
         self.tiles = None
         self.entities = []
     
+    def fov_array(self):
+        return {k: t.blocked==False for (k, t) in self.tiles.items()}
+
     def random_empty_loc(self):
         entity_locs = [e.loc for  e in self.entities]
         return random.choice([k for k, v in self.tiles.items() if not v.blocked and k not in entity_locs])
@@ -27,17 +29,6 @@ class Map():
         x = random.randrange(0, (self.width))
         y = random.randrange(0, (self.height))
         return Location(x, y)
-    
-    def con(self):
-        con = tcod.console.Console(self.width, self.height, order='F')
-        for k, t in self.tiles.items():
-            if t.seen:
-                con.tiles[k] = (
-                    ord(t.glyph),
-                    (60, 60, 60, 255),
-                    (*tcod.black, 255)
-                )
-        return con
 
 class MazeMap(Map):
     def __init__(self, width, height, entry=None, id=0):

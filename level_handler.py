@@ -1,7 +1,9 @@
 import os, pickle, re
+import tcod
 from levels import environment
-from entity import Entity
+import entity
 from levels import field_of_view as fov 
+from pathfinding import astar
 from settings import *
 
 #################
@@ -20,7 +22,7 @@ def delete_all():
 
 
 def create(width, height):
-    global env
+    global env, tiles
     #find highest id in gamedata
     filenames = os.listdir('gamedata')
     p = re.compile(r'_(?P<id>\d+)\.')
@@ -30,6 +32,8 @@ def create(width, height):
     except ValueError:
         newid = 1
     env = environment.MazeMap(width, height, id=newid)
+    # Populate environment with entities
+    add_exit(env.random_unblocked_loc(), env.id + 1)
 
 
 def load(id):
@@ -51,6 +55,11 @@ def exits():
     return sorted(lst, key = lambda e: e.action.dest_id)
 
 
+def update_seen(vismap):
+    for loc in vismap:
+        env.tiles[loc].seen = True
+
+
 def add_exit(loc=None, id=None):
     global env
     loc = loc or env.random_empty_loc()
@@ -61,27 +70,44 @@ def add_exit(loc=None, id=None):
     else:
         glyph = '<'
         label = 'Exit up'
-    env.entities.append(Entity(label, glyph, loc, RelocateUser(loc, id)))
+    env.entities.append(entity.Entity(label, glyph, loc, Relocate(loc, id)))
+
+def find_path(start, end):
+    return astar(env.tiles, start, end)
+
+def render(fov):
+    con = tcod.console.Console(env.width, env.height, order='F')
+    # Add env tiles to console
+    for k, t in env.tiles.items():
+        if k in fov:
+            con.tiles[k] = (
+                ord(t.glyph),
+                (120, 120, 120, 255),
+                (*tcod.black, 255)
+            )
+        elif t.seen:
+            con.tiles[k] = (
+                ord(t.glyph),
+                (60, 60, 60, 255),
+                (*tcod.black, 255)
+            )
+    # Add entities to console
+    for en in env.entities:
+        if en.loc() in fov:
+            con.print_(*en.loc(), en.glyph)
+
+    return con
 
 
-def update_seen(vismap):
-    for loc in vismap:
-        env.tiles[loc].seen = True
-
-
-def update_entity_fov(e):
-    vismap = {k: t.blocked==False for (k, t) in env.tiles.items()}
-    e.fov = fov.scan(e.loc(), vismap, e.fov_max)
-
-class RelocateUser:
+class Relocate:
     global env
     def __init__(self, loc, dest_id):
         self.loc = loc
         self.dest_id = dest_id
 
-    def __call__(self, user):
-        print('relocation triggered.')
-        user.loc.set(*self.loc)
+    def __call__(self, entity):
+        print('Transportation triggered.')
+        entity.loc.set(*self.loc)
         save()
         try:
             load(self.dest_id)
@@ -90,4 +116,3 @@ class RelocateUser:
             print('Level not found. Creating new level')
             create(MAP_WIDTH, MAP_HEIGHT)
             add_exit(self.loc, self.dest_id - 1)
-            add_exit(env.random_empty_loc(), self.dest_id + 1)
