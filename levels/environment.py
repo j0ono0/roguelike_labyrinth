@@ -77,7 +77,7 @@ class MazeMap(Map):
             raise ValueError('mazeMap must be odd width and height.')
         # Build new graph and clear existing tiles
         graph = self.build_graph((self.width // 2) + 1, (self.height // 2) + 1)
-        self.fill_tiles(Tile('#', True))
+        self.fill_tiles(Tile('wall', '#', True))
         
         # Update tiles from graph data
         for loc, edges in graph.items():
@@ -90,13 +90,14 @@ class MazeMap(Map):
             for p in path:
                 # offset tiles by +1 to create solid border
                 #p = (p[0] + 1, p[1] + 1)
+                self.tiles[p].name = 'ground'
                 self.tiles[p].glyph = '.'
                 self.tiles[p].blocked = False
 
 class Tile:
-    def __init__(self, glyph='#', blocked=True):
+    def __init__(self, name='wall', glyph='#', blocked=True):
+        self.name = name
         self.glyph = glyph
         self.blocked = blocked
-        self.visible = False
         self.seen = False
         

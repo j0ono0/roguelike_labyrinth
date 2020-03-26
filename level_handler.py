@@ -60,6 +60,15 @@ def update_seen(vismap):
         env.tiles[loc].seen = True
 
 
+def move_interaction(loc):
+    # Test for consequences of entities moving through/onto tiles
+    entities = [e for  e in env.entities if e.loc == loc]
+    if  env.tiles[loc].blocked:
+        return env.tiles[loc]
+    elif  len(entities) != 0:
+        return entities[0]
+    return None
+
 def add_exit(loc=None, id=None):
     global env
     loc = loc or env.random_empty_loc()
@@ -70,8 +79,11 @@ def add_exit(loc=None, id=None):
     else:
         glyph = '<'
         label = 'Exit up'
-    env.entities.append(entity.Entity(label, glyph, loc, Relocate(loc, id)))
-
+    """
+    exit = entity.Entity(label, glyph, loc)
+    exit.add_ability('action', Relocate(loc, id))
+    env.entities.append(exit)
+    """
 def find_path(start, end):
     return astar(env.tiles, start, end)
 
