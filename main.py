@@ -2,7 +2,7 @@
 import random
 import tcod
 
-import entity_lib as el
+from elements import library as el
 import level_handler as lvl
 from settings import *
 

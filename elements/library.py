@@ -1,5 +1,5 @@
-import entity
-import actions
+from . import entity
+from . import actions
 
 
 def ground(loc):
@@ -11,23 +11,23 @@ def wall():
 
 
 def stairs_up(env_id, loc=(-1,-1), return_entity=None):
-    return entity.Entity(
-                    'Stairs up', 
-                    '<', 
-                    False, 
-                    loc,
-                    actions.MoveToLevel(env_id, return_entity)
-                )
+    return  entity.Entity(
+                'Stairs up', 
+                '<', 
+                False, 
+                loc,
+                actions.MoveToLevel(env_id, return_entity)
+            )
 
 
 def stairs_down(env_id, loc=(-1,-1), return_entity=None):
-    return entity.Entity(
-                    'Stairs down', 
-                    '>', 
-                    False, 
-                    loc,
-                    actions.MoveToLevel(env_id, return_entity)
-                )
+    return  entity.Entity(
+                'Stairs down', 
+                '>', 
+                False, 
+                loc,
+                actions.MoveToLevel(env_id, return_entity)
+            )
                 
 
 # Build 'beings' ie: monsters & player character

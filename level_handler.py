@@ -1,10 +1,9 @@
 import os, pickle, re
 import tcod
 from levels import environment
-import entity
 from pathfinding import astar
 from settings import *
-import entity_lib as el
+from elements import library as el
 
 
 #################

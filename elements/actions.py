@@ -1,5 +1,5 @@
 from settings import *
-import entity
+from . import entity
 
 
 class Interact:

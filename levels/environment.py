@@ -1,7 +1,7 @@
 import random
 import copy
 from collections import namedtuple
-import entity_lib as el
+from elements import library as el
 
 Location = namedtuple('Location',['x', 'y'])
 
