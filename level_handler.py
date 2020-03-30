@@ -2,15 +2,15 @@ import os, pickle, re
 import tcod
 from levels import environment
 import entity
-from levels import field_of_view as fov 
 from pathfinding import astar
 from settings import *
+import entity_lib as el
+
 
 #################
 # Module variables
 lvl_prefix = 'env_'
 env = None
-
 #################
 
 
@@ -20,20 +20,38 @@ def delete_all():
         path = os.path.join('gamedata', filename)
         os.remove(path)
 
+def instantiate_env(env_id):
+    """
+    Save current level, 
+    load requested level if it exists 
+    otherwise create a new level
+    """
+    save()
+    try:
+        load(env_id)
+        print(f'level {env.id} loaded')
+    except FileNotFoundError:
+        print('Level not found. Creating new level')
+        create(MAP_WIDTH, MAP_HEIGHT)
 
 def create(width, height):
-    global env, tiles
+    global env
     #find highest id in gamedata
     filenames = os.listdir('gamedata')
     p = re.compile(r'_(?P<id>\d+)\.')
     ids = [int(p.search(i).group('id')) for i in filenames]
     try:
         newid = max(ids) + 1
+        env = environment.MazeMap(width, height, id=newid)
     except ValueError:
         newid = 1
-    env = environment.MazeMap(width, height, id=newid)
-    # Populate environment with entities
-    add_exit(env.random_unblocked_loc(), env.id + 1)
+        env = environment.BigRoom(width, height, id=newid)
+
+    # Populate environment with some exits
+    exit_up = el.stairs_up(newid)
+    exit_down = el.stairs_down(newid+1, env.random_empty_loc(), exit_up)
+    env.entities.append(exit_down)
+
 
 
 def load(id):
@@ -51,41 +69,26 @@ def save():
     
 
 def exits():
-    lst = [e for e in env.entities if e.glyph in ['<','>'] and e.action.dest_id]
-    return sorted(lst, key = lambda e: e.action.dest_id)
-
+    return [e for e in env.entities if e.glyph in ['<','>']]
+    
 
 def update_seen(vismap):
     for loc in vismap:
         env.tiles[loc].seen = True
 
 
-def move_interaction(loc):
-    # Test for consequences of entities moving through/onto tiles
-    entities = [e for  e in env.entities if e.loc == loc]
-    if  env.tiles[loc].blocked:
-        return env.tiles[loc]
-    elif  len(entities) != 0:
+def get_target(loc, blocked=True):
+    # Return entities (or tile) at location
+    entities = [e for  e in env.entities if e.loc() == loc and e.blocked == blocked]
+    if  len(entities) != 0:
         return entities[0]
-    return None
 
-def add_exit(loc=None, id=None):
-    global env
-    loc = loc or env.random_empty_loc()
-    id = id or env.id
-    if id >= env.id:
-        glyph = '>'
-        label = 'Exit down'
-    else:
-        glyph = '<'
-        label = 'Exit up'
-    """
-    exit = entity.Entity(label, glyph, loc)
-    exit.add_ability('action', Relocate(loc, id))
-    env.entities.append(exit)
-    """
+    return env.tiles[loc]
+
+    
 def find_path(start, end):
     return astar(env.tiles, start, end)
+
 
 def render(fov):
     con = tcod.console.Console(env.width, env.height, order='F')
@@ -110,21 +113,3 @@ def render(fov):
 
     return con
 
-
-class Relocate:
-    global env
-    def __init__(self, loc, dest_id):
-        self.loc = loc
-        self.dest_id = dest_id
-
-    def __call__(self, entity):
-        print('Transportation triggered.')
-        entity.loc.set(*self.loc)
-        save()
-        try:
-            load(self.dest_id)
-            print(f'level {env.id} loaded')
-        except FileNotFoundError:
-            print('Level not found. Creating new level')
-            create(MAP_WIDTH, MAP_HEIGHT)
-            add_exit(self.loc, self.dest_id - 1)

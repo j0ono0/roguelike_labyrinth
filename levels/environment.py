@@ -1,11 +1,12 @@
 import random
 import copy
 from collections import namedtuple
+import entity_lib as el
 
 Location = namedtuple('Location',['x', 'y'])
 
 class Map():
-    def __init__(self, width, height, entry=None, id=0):
+    def __init__(self, width, height, id=0):
         self.id = id
         self.width = width
         self.height = height
@@ -30,9 +31,19 @@ class Map():
         y = random.randrange(0, (self.height))
         return Location(x, y)
 
+class BigRoom(Map):
+    def __init__(self, width, height, id=0):
+        super().__init__(width, height, id)
+        self.build()
+
+    def build(self):
+        self.fill_tiles(el.wall())
+        for loc in [(x,y) for x in range(1, self.width - 1) for y in range(1, self.height - 1)]:
+            self.tiles[loc] = el.ground(loc)
+
 class MazeMap(Map):
-    def __init__(self, width, height, entry=None, id=0):
-        super().__init__(width, height, entry, id)
+    def __init__(self, width, height, id=0):
+        super().__init__(width, height, id)
         self.build()
     
     def random_unblocked_loc(self):
@@ -77,7 +88,7 @@ class MazeMap(Map):
             raise ValueError('mazeMap must be odd width and height.')
         # Build new graph and clear existing tiles
         graph = self.build_graph((self.width // 2) + 1, (self.height // 2) + 1)
-        self.fill_tiles(Tile('wall', '#', True))
+        self.fill_tiles(el.wall())
         
         # Update tiles from graph data
         for loc, edges in graph.items():
@@ -88,16 +99,4 @@ class MazeMap(Map):
                 path.append((loc.x * 2 + dx, loc.y * 2 + dy))
                 
             for p in path:
-                # offset tiles by +1 to create solid border
-                #p = (p[0] + 1, p[1] + 1)
-                self.tiles[p].name = 'ground'
-                self.tiles[p].glyph = '.'
-                self.tiles[p].blocked = False
-
-class Tile:
-    def __init__(self, name='wall', glyph='#', blocked=True):
-        self.name = name
-        self.glyph = glyph
-        self.blocked = blocked
-        self.seen = False
-        
+                self.tiles[p] = el.ground(p)

@@ -4,15 +4,17 @@
 #
 ###########################################################
 from collections import namedtuple
-from levels import field_of_view
+import field_of_view
 
 class Entity():
-    def __init__(self, name, glyph, coords=(0,0)):
+    def __init__(self, name, glyph, blocked=True, coords=(0,0), action=None):
         self.name = name
         self.glyph = glyph
         self._x = coords[0]
         self._y = coords[1]
-        
+        self.blocked = blocked
+        self.action = action
+
     def __str__(self):
         return self.name
 
@@ -28,10 +30,21 @@ class Entity():
     
     def move(self, coords):
             self.set_loc(self.proposed_loc(coords))
-        
-    def use(self, tool):
-        tool.action(self)
 
+class Tile:
+    def __init__(self, name, glyph, blocked, action):
+        self.name = name
+        self.glyph = glyph
+        self.blocked = blocked
+        self.seen = False
+        self.action = action
+
+
+###################
+#
+# Entity attributes
+#
+###################
 
 class Vision():
     def __init__(self, vision, loc):
@@ -46,10 +59,3 @@ class Vision():
 class Being(Entity):
     def __init__(self, name, glyph):
         super.__init__(name, glyph)
-
-# Build 'beings' ie: monsters & player character
-def being(name, glyph, vision):
-    b = Entity(name, glyph)
-    percept = Vision(vision, b.loc)
-    setattr(b, 'percept', percept)
-    return b
