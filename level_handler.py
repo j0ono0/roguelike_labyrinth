@@ -48,8 +48,10 @@ def create(width, height):
 
     # Populate environment with some exits
     exit_up = el.stairs_up(newid)
-    exit_down = el.stairs_down(newid+1, env.random_empty_loc(), exit_up)
-    env.entities.append(exit_down)
+    x,y = env.random_empty_loc()
+    exit_down = el.stairs_down(newid+1, (x,y), exit_up)
+    #env.entities.append(exit_down)
+    env.tiles[x][y].inventory.add(exit_down)
 
 
 
