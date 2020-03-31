@@ -73,7 +73,8 @@ def exits():
 
 def update_seen(vismap):
     for loc in vismap:
-        env.tiles[loc].seen = True
+        x, y = loc
+        env.tiles[x][y].seen = True
 
 
 def get_target(loc, blocked=True):
@@ -81,8 +82,8 @@ def get_target(loc, blocked=True):
     entities = [e for  e in env.entities if e.loc() == loc and e.blocked == blocked]
     if  len(entities) != 0:
         return entities[0]
-
-    return env.tiles[loc]
+    x, y = loc
+    return env.tiles[x][y]
 
     
 def find_path(start, end):
@@ -92,19 +93,22 @@ def find_path(start, end):
 def render(fov):
     con = tcod.console.Console(env.width, env.height, order='F')
     # Add env tiles to console
-    for k, t in env.tiles.items():
-        if k in fov:
-            con.tiles[k] = (
-                ord(t.glyph),
-                (120, 120, 120, 255),
-                (*tcod.black, 255)
-            )
-        elif t.seen:
-            con.tiles[k] = (
-                ord(t.glyph),
-                (60, 60, 60, 255),
-                (*tcod.black, 255)
-            )
+    for x in range(MAP_WIDTH): 
+        for y in range(MAP_HEIGHT):
+            t = env.tiles[x][y]
+            if (x,y) in fov:
+                con.tiles[(x,y)] = (
+                    ord(t.glyph),
+                    (120, 120, 120, 255),
+                    (*tcod.black, 255)
+                )
+            elif t.seen:
+                con.tiles[(x,y)] = (
+                    ord(t.glyph),
+                    (60, 60, 60, 255),
+                    (*tcod.black, 255)
+                )
+            
     # Add entities to console
     for en in env.entities:
         if en.loc() in fov:

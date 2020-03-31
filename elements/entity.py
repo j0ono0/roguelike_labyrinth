@@ -36,8 +36,9 @@ class Tile:
         self.name = name
         self.glyph = glyph
         self.blocked = blocked
-        self.seen = False
         self.action = action
+        self.inventory = Inventory(5)
+        self.seen = False
 
 
 ###################
@@ -45,6 +46,11 @@ class Tile:
 # Entity attributes
 #
 ###################
+
+class Inventory:
+    def __init__(self, max):
+        self.items = []
+        self.max = max
 
 class Vision():
     def __init__(self, vision, loc):

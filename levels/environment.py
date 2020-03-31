@@ -10,21 +10,22 @@ class Map():
         self.id = id
         self.width = width
         self.height = height
-        self.tiles = None
+        self.tiles = []
         self.entities = []
     
     def fov_array(self):
-        return {k: t.blocked==False for (k, t) in self.tiles.items()}
+        return {(x,y): self.tiles[x][y].blocked == False for x in range(self.width) for y in range(self.height)}
 
     def random_empty_loc(self):
-        entity_locs = [e.loc for  e in self.entities]
-        return random.choice([k for k, v in self.tiles.items() if not v.blocked and k not in entity_locs])
+        entity_locs = set([e.loc for  e in self.entities])
+        unblocked_locs = set([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].blocked == False)])
+        return random.choice(list(unblocked_locs.difference(entity_locs)))
 
     def random_unblocked_loc(self):
-        return random.choice([k for k, v in self.tiles.items() if not v.blocked])
+        return random.choice([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].blocked == False)])
 
-    def fill_tiles(self, tile): 
-        self.tiles = {(x,y): copy.copy(tile) for x in range(self.width) for y in range(self.height)}
+    def fill_tiles(self, tile):
+        self.tiles = [[copy.copy(tile) for y in range(self.width)] for x in range(self.height)]
     
     def random_tile_loc(self):
         x = random.randrange(0, (self.width))
@@ -38,8 +39,8 @@ class BigRoom(Map):
 
     def build(self):
         self.fill_tiles(el.wall())
-        for loc in [(x,y) for x in range(1, self.width - 1) for y in range(1, self.height - 1)]:
-            self.tiles[loc] = el.ground(loc)
+        for x, y in [(x,y) for x in range(1, self.width - 1) for y in range(1, self.height - 1)]:
+            self.tiles[x][y] = el.ground((x,y))
 
 class MazeMap(Map):
     def __init__(self, width, height, id=0):
@@ -99,4 +100,5 @@ class MazeMap(Map):
                 path.append((loc.x * 2 + dx, loc.y * 2 + dy))
                 
             for p in path:
-                self.tiles[p] = el.ground(p)
+                x, y = p
+                self.tiles[x][y] = el.ground(p)
