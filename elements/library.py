@@ -30,7 +30,7 @@ def stairs_down(env_id, loc=(-1,-1), return_entity=None):
             )
                 
 
-# Build 'beings' ie: monsters & player character
+# Player character, non-player characters & monsters
 def being(name, glyph, vision):
     b = entity.Entity(name, glyph)
     percept = entity.Vision(vision, b.loc)
