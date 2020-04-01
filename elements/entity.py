@@ -40,7 +40,7 @@ class Tile:
         self.inventory = Inventory(5)
         self.seen = False
 
-    def display(self):
+    def focus_of_attention(self):
         try:
             return self.inventory.items[0]
         except IndexError:

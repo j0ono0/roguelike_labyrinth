@@ -78,12 +78,9 @@ def update_seen(vismap):
 
 
 def get_target(loc, blocked=True):
-    # Return entities (or tile) at location
-    entities = [e for  e in env.entities if e.loc() == loc and e.blocked == blocked]
-    if  len(entities) != 0:
-        return entities[0]
+    # Return first item (or tile) at location
     x, y = loc
-    return env.tiles[x][y]
+    return env.tiles[x][y].focus_of_attention()
 
     
 def find_path(start, end):
@@ -97,7 +94,7 @@ def render(fov):
         for y in range(MAP_HEIGHT):
             t = env.tiles[x][y]
             if (x,y) in fov:
-                t = t.display()
+                t = t.focus_of_attention()
                 con.tiles[(x,y)] = (
                     ord(ELEMENTS[t.name].glyph),
                     ELEMENTS[t.name].color + [255],

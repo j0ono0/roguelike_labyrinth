@@ -62,18 +62,21 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
             if event.type == 'KEYDOWN':
 
                 if event.sym in MOVEMENT_KEYS:
+                    # Movement interacts with tile only 
                     try:
-                        loc = player.proposed_loc(MOVEMENT_KEYS[event.sym])
-                        target = lvl.get_target(loc)
+                        x, y = player.proposed_loc(MOVEMENT_KEYS[event.sym])
+                        target = lvl.env.tiles[x][y]
                         try:
                             target.action(player, target, lvl)
                         except AttributeError:
                             print('The {} blocks your way.'.format(target.name))
                         
-                    except KeyError as e:
+                    except IndexError as e:
                         # Player reached edge of environment
                         print('There is no way through here!')
                 elif event.sym in ACTION_KEYS:
+                    # Action keys interact with elements ion tile
+                    # or tile if no elements are present
                     target = lvl.get_target(player.loc(), blocked=False)
                     try:
                         target.action(player, target, lvl)

@@ -5,12 +5,25 @@ from elements import library as el
 
 Location = namedtuple('Location',['x', 'y'])
 
+
+class LimitList(list):
+    """
+    Prohibit negative index values. 
+    Used for tracking map locations where negative 
+    values would leave tghe valid map
+    """
+    def __getitem__(self, index):
+        if index < 0:
+            raise IndexError('Index out of range (negative value in LimitList)')
+        return super().__getitem__(index)
+
+
 class Map():
     def __init__(self, width, height, id=0):
         self.id = id
         self.width = width
         self.height = height
-        self.tiles = []
+        self.tiles = None
         self.entities = []
     
     def fov_array(self):
@@ -24,8 +37,8 @@ class Map():
     def random_unblocked_loc(self):
         return random.choice([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].blocked == False)])
 
-    def fill_tiles(self, tile):
-        self.tiles = [[copy.copy(tile) for y in range(self.width)] for x in range(self.height)]
+    def fill_tiles(self):
+        self.tiles = LimitList([LimitList([el.wall() for y in range(self.width)]) for x in range(self.height)])
     
     def random_tile_loc(self):
         x = random.randrange(0, (self.width))
@@ -38,7 +51,7 @@ class BigRoom(Map):
         self.build()
 
     def build(self):
-        self.fill_tiles(el.wall())
+        self.fill_tiles()
         for x, y in [(x,y) for x in range(1, self.width - 1) for y in range(1, self.height - 1)]:
             self.tiles[x][y] = el.ground((x,y))
 
@@ -89,7 +102,7 @@ class MazeMap(Map):
             raise ValueError('mazeMap must be odd width and height.')
         # Build new graph and clear existing tiles
         graph = self.build_graph((self.width // 2) + 1, (self.height // 2) + 1)
-        self.fill_tiles(el.wall())
+        self.fill_tiles()
         
         # Update tiles from graph data
         for loc, edges in graph.items():

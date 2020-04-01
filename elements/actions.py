@@ -35,6 +35,7 @@ class MoveToLevel:
             lvl.create(MAP_WIDTH, MAP_HEIGHT)
             if self.return_entity:
                 print('adding return stairs to loc:', user.loc())
-                self.return_entity.set_loc(user.loc())
-                lvl.env.entities.append(self.return_entity)
+                x, y = user.loc()
+                lvl.env.tiles[x][y].inventory.add(self.return_entity)
+                
 
