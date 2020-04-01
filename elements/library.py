@@ -12,7 +12,7 @@ def wall():
 
 def stairs_up(env_id, loc=(-1,-1), return_entity=None):
     return  entity.Entity(
-                'Stairs up', 
+                'stairs up', 
                 '<', 
                 False, 
                 loc,
@@ -22,7 +22,7 @@ def stairs_up(env_id, loc=(-1,-1), return_entity=None):
 
 def stairs_down(env_id, loc=(-1,-1), return_entity=None):
     return  entity.Entity(
-                'Stairs down', 
+                'stairs down', 
                 '>', 
                 False, 
                 loc,

@@ -34,15 +34,18 @@ class Entity():
 class Tile:
     def __init__(self, name, glyph, blocked, action):
         self.name = name
-        self.base_glyph = glyph
+        self.glyph = glyph
         self.blocked = blocked
         self.action = action
         self.inventory = Inventory(5)
         self.seen = False
+
+    def display(self):
+        try:
+            return self.inventory.items[0]
+        except IndexError:
+            return self
     
-    @property
-    def glyph(self):
-        return self.inventory.first() or self.base_glyph
 
 
 ###################
@@ -50,6 +53,10 @@ class Tile:
 # Entity attributes
 #
 ###################
+
+class Stairs:
+    glyph = '>'
+    color = '255,255,255'
 
 class Inventory:
     def __init__(self, max):
@@ -59,11 +66,6 @@ class Inventory:
     def add(self, item):
         self.items.insert(0, item)
 
-    def first(self):
-        try:
-            return self.items[0].glyph
-        except IndexError:
-            return None
 
 class Vision():
     def __init__(self, vision, loc):

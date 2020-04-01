@@ -1,3 +1,4 @@
+from collections import namedtuple
 import tcod.event
 
 SCREEN_WIDTH = 30
@@ -20,4 +21,15 @@ MOVEMENT_KEYS = {
 }
 ACTION_KEYS = {
     tcod.event.K_SPACE: True
+}
+
+Obj = namedtuple('Obj', ['glyph','color', 'block_sight', 'block_motion'])
+ELEMENTS = {
+    'ground':       Obj('.', [100, 100, 100], False, False),
+    'stairs down':  Obj('>', [255, 255, 255], False, False),
+    'stairs up':    Obj('<', [255, 255, 255], False, False),
+    'wall':         Obj('#', [120, 120, 120], True,  True),
+    ## Elements that render if unseen ##
+    'ground--unseen':   Obj('.', [50, 50, 50], False, False),
+    'wall--unseen':     Obj('#', [70, 70, 70], True,  True),
 }

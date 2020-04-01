@@ -47,12 +47,10 @@ def create(width, height):
         env = environment.BigRoom(width, height, id=newid)
 
     # Populate environment with some exits
-    exit_up = el.stairs_up(newid)
+    stairs_up = el.stairs_up(newid)
     x,y = env.random_empty_loc()
-    exit_down = el.stairs_down(newid+1, (x,y), exit_up)
-    #env.entities.append(exit_down)
-    env.tiles[x][y].inventory.add(exit_down)
-
+    stairs_down = el.stairs_down(newid+1, (x,y), stairs_up)
+    env.tiles[x][y].inventory.add(stairs_down)
 
 
 def load(id):
@@ -99,15 +97,17 @@ def render(fov):
         for y in range(MAP_HEIGHT):
             t = env.tiles[x][y]
             if (x,y) in fov:
+                t = t.display()
                 con.tiles[(x,y)] = (
-                    ord(t.glyph),
-                    (120, 120, 120, 255),
+                    ord(ELEMENTS[t.name].glyph),
+                    ELEMENTS[t.name].color + [255],
                     (*tcod.black, 255)
                 )
             elif t.seen:
+                key = t.name + '--unseen'
                 con.tiles[(x,y)] = (
-                    ord(t.glyph),
-                    (60, 60, 60, 255),
+                    ord(ELEMENTS[key].glyph),
+                    ELEMENTS[key].color + [150],
                     (*tcod.black, 255)
                 )
             
