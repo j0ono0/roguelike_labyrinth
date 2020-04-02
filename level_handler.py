@@ -48,9 +48,8 @@ def create(width, height):
 
     # Populate environment with some exits
     stairs_up = el.stairs_up(newid)
-    x,y = env.random_empty_loc()
-    stairs_down = el.stairs_down(newid+1, (x,y), stairs_up)
-    env.tiles[x][y].inventory.add(stairs_down)
+    stairs_down = el.stairs_down(newid+1, env.random_empty_loc(), stairs_up)
+    env.entities.append(stairs_down)
 
 
 def load(id):
@@ -77,11 +76,13 @@ def update_seen(vismap):
         env.tiles[x][y].seen = True
 
 
-def get_target(loc, blocked=True):
+def get_target(loc, blocked=False):
     # Return first item (or tile) at location
-    x, y = loc
-    return env.tiles[x][y].focus_of_attention()
+    return next(iter([e for e in env.entities if e.loc() == loc and e.blocked == blocked]), get_tile(loc))
 
+def get_tile(loc):
+    x, y = loc
+    return env.tiles[x][y]
     
 def find_path(start, end):
     return astar(env.tiles, start, end)
@@ -94,7 +95,6 @@ def render(fov):
         for y in range(MAP_HEIGHT):
             t = env.tiles[x][y]
             if (x,y) in fov:
-                t = t.focus_of_attention()
                 con.tiles[(x,y)] = (
                     ord(ELEMENTS[t.name].glyph),
                     ELEMENTS[t.name].color + [255],

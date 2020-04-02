@@ -37,15 +37,7 @@ class Tile:
         self.glyph = glyph
         self.blocked = blocked
         self.action = action
-        self.inventory = Inventory(5)
-        self.seen = False
-
-    def focus_of_attention(self):
-        try:
-            return self.inventory.items[0]
-        except IndexError:
-            return self
-    
+        self.seen = False    
 
 
 ###################
@@ -53,10 +45,6 @@ class Tile:
 # Entity attributes
 #
 ###################
-
-class Stairs:
-    glyph = '>'
-    color = '255,255,255'
 
 class Inventory:
     def __init__(self, max):

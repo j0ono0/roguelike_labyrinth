@@ -64,8 +64,8 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
                 if event.sym in MOVEMENT_KEYS:
                     # Movement interacts with tile only 
                     try:
-                        x, y = player.proposed_loc(MOVEMENT_KEYS[event.sym])
-                        target = lvl.env.tiles[x][y]
+                        loc = player.proposed_loc(MOVEMENT_KEYS[event.sym])
+                        target = lvl.get_target(loc, True)
                         try:
                             target.action(player, target, lvl)
                         except AttributeError:
@@ -77,7 +77,8 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
                 elif event.sym in ACTION_KEYS:
                     # Action keys interact with elements ion tile
                     # or tile if no elements are present
-                    target = lvl.get_target(player.loc(), blocked=False)
+                    target = lvl.get_target(player.loc())
+                    print(target)
                     try:
                         target.action(player, target, lvl)
                     except AttributeError:
