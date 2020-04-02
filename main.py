@@ -4,8 +4,11 @@ import tcod
 
 from elements import library as el
 import level_handler as lvl
+import keyboard
 from settings import *
 
+# Setup keyboard input
+kb = keyboard.GameInput()
 
 # Setup the font.
 tcod.console_set_custom_font(
@@ -58,33 +61,23 @@ with tcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, order="F") as console:
         tcod.console_flush()
 
         # User input
-        for event in tcod.event.wait():
-            if event.type == 'KEYDOWN':
+        fn, args, kwargs = kb.capture_keypress()
+        print(fn)
+        if fn == 'move':
+            try:
+                loc = player.proposed_loc(args)
+                target = lvl.get_target(loc, True)
+                try:
+                    target.action(player, target, lvl)
+                except AttributeError:
+                    print('The {} blocks your way.'.format(target.name))
+            except IndexError as e:
+                # Player reached edge of environment
+                print('There is no way through here!')
 
-                if event.sym in MOVEMENT_KEYS:
-                    # Movement interacts with tile only 
-                    try:
-                        loc = player.proposed_loc(MOVEMENT_KEYS[event.sym])
-                        target = lvl.get_target(loc, True)
-                        try:
-                            target.action(player, target, lvl)
-                        except AttributeError:
-                            print('The {} blocks your way.'.format(target.name))
-                        
-                    except IndexError as e:
-                        # Player reached edge of environment
-                        print('There is no way through here!')
-                elif event.sym in ACTION_KEYS:
-                    # Action keys interact with elements ion tile
-                    # or tile if no elements are present
-                    target = lvl.get_target(player.loc())
-                    print(target)
-                    try:
-                        target.action(player, target, lvl)
-                    except AttributeError:
-                        print('You see no way to use the {}.'.format(target.name))
-                    
-
-            if event.type == 'QUIT':
-                # Halt the script using SystemExit
-                raise SystemExit('The window has been closed.')
+        elif fn == 'use':
+                target = lvl.get_target(player.loc())
+                try:
+                    target.action(player, target, lvl)
+                except AttributeError:
+                    print('You see no way to use the {}.'.format(target.name))
