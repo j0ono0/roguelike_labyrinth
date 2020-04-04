@@ -49,7 +49,10 @@ def create(width, height):
     # Populate environment with some exits
     stairs_up = el.stairs_up(newid)
     stairs_down = el.stairs_down(newid+1, env.random_empty_loc(), stairs_up)
-    env.entities.append(stairs_down)
+    # Populate environment with some items
+    thing = el.thingy(env.random_empty_loc())
+
+    env.entities.extend([stairs_down, thing])
 
 
 def load(id):
@@ -88,8 +91,8 @@ def find_path(start, end):
     return astar(env.tiles, start, end)
 
 
-def render(fov):
-    con = tcod.console.Console(env.width, env.height, order='F')
+def blit(console, fov):
+    con = tcod.console.Console(env.width, env.height, order="F")
     # Add env tiles to console
     for x in range(MAP_WIDTH): 
         for y in range(MAP_HEIGHT):
@@ -109,9 +112,9 @@ def render(fov):
                 )
             
     # Add entities to console
-    for en in env.entities:
-        if en.loc() in fov:
-            con.print_(*en.loc(), en.glyph)
+    for e in env.entities:
+        if e.loc() in fov:
+            con.print_(*e.loc(), e.glyph)
 
-    return con
+    con.blit(console, *MAP_OFFSET, 0, 0, MAP_WIDTH+2, MAP_HEIGHT+2, 1, 0, 0)
 

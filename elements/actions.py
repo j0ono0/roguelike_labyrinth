@@ -1,15 +1,16 @@
 from settings import *
 from . import entity
+import interface as ui
 
 
 class Interact:
     def __call__(self, user, target, lvl):
-        print("{} interacts with {}".format(user.name, target.name))
+        ui.narrative.add("{} interacts with {}".format(user.name, target.name))
         
 
 class BlockUser:
     def __call__(self, user, target, lvl):
-        print("The {} does not move, that way is blocked".format(target.name))
+        ui.narrative.add("The {} does not move, that way is blocked".format(target.name))
 
 
 class MoveToLoc:
@@ -17,7 +18,7 @@ class MoveToLoc:
         self.loc = loc
     
     def __call__(self, user, target, lvl):
-        user.set_loc(self.loc)
+        user.loc.update(self.loc)
 
 
 class MoveToLevel:
@@ -34,7 +35,7 @@ class MoveToLevel:
             print('Level not found. Creating new level')
             lvl.create(MAP_WIDTH, MAP_HEIGHT)
             if self.return_entity:
-                self.return_entity.set_loc(user.loc())
+                self.return_entity.loc.update(user.loc())
                 lvl.env.entities.append(self.return_entity)
                 
 

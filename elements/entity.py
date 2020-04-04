@@ -5,39 +5,7 @@
 ###########################################################
 from collections import namedtuple
 import field_of_view
-
-class Entity():
-    def __init__(self, name, glyph, blocked=True, coords=(0,0), action=None):
-        self.name = name
-        self.glyph = glyph
-        self._x = coords[0]
-        self._y = coords[1]
-        self.blocked = blocked
-        self.action = action
-
-    def __str__(self):
-        return self.name
-
-    def loc(self):
-        return (self._x, self._y)
-    
-    def set_loc(self, coords):
-        self._x = coords[0]
-        self._y = coords[1]
-    
-    def proposed_loc(self, coords):
-        return (self._x + coords[0], self._y + coords[1])
-    
-    def move(self, coords):
-            self.set_loc(self.proposed_loc(coords))
-
-class Tile:
-    def __init__(self, name, glyph, blocked, action):
-        self.name = name
-        self.glyph = glyph
-        self.blocked = blocked
-        self.action = action
-        self.seen = False    
+import interface as ui 
 
 
 ###################
@@ -46,6 +14,25 @@ class Tile:
 #
 ###################
 
+class Location:
+    def __init__(self, coords=(-1,-1)):
+        self._x = coords[0]
+        self._y = coords[1]
+
+    def __call__(self):
+        return (self._x, self._y)
+
+    def update(self, coords):
+        self._x = coords[0]
+        self._y = coords[1]
+
+    def proposed(self, direction):
+        return (self._x + direction[0], self._y + direction[1])
+    
+    def move(self, coords):
+            self.update(self.proposed(coords))
+
+
 class Inventory:
     def __init__(self, max):
         self.items = []
@@ -53,6 +40,19 @@ class Inventory:
 
     def add(self, item):
         self.items.insert(0, item)
+
+    def pickup(self, user, target, lvl):
+        e = lvl.env.entities
+        i = e.index(target)
+        self.add(e.pop(i))
+        target.loc = user.loc
+        ui.narrative.add('{} picks up a {}.'.format(user.name, target.name))
+
+    def drop(self, user, target, lvl):
+        i = self.items.index(target)
+        target.loc = Location(target.loc())
+        lvl.env.entities.append(self.items.pop(i))
+        ui.narrative.add('{} drops a {}.'.format(user.name, target.name))
 
 
 class Vision():
@@ -63,8 +63,31 @@ class Vision():
  
     def scan(self, vismap):
         self.fov = field_of_view.scan(self.loc(), vismap, self.vision)
-    
 
-class Being(Entity):
-    def __init__(self, name, glyph):
-        super.__init__(name, glyph)
+
+###################
+#
+# Entities
+#
+###################
+
+class Entity():
+    def __init__(self, name, glyph, loc=Location(), blocked=True, action=None):
+        self.name = name
+        self.glyph = glyph
+        self.loc = loc
+        self.blocked = blocked
+        self.action = action
+
+    def __str__(self):
+        return self.name
+
+class Tile:
+    def __init__(self, name, glyph, blocked, action):
+        self.name = name
+        self.glyph = glyph
+        self.blocked = blocked
+        self.action = action
+        self.seen = False    
+
+

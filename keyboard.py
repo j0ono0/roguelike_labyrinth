@@ -8,21 +8,22 @@ from settings import *
 
 class InputHandler:
     def capture_keypress(self):
-        # Wait for a key stroke
-        for event in tcod.event.wait():
-        
-        # Return content from keymap
-            if event.type == 'KEYDOWN':
-                try:
-                    return self.keymap[event.sym]
-                except KeyError as e:
-                    print('key not registered.', e)
+        while True:
+            # Wait for a key stroke
+            for event in tcod.event.wait():
+            
+            # Return content from keymap
+                if event.type == 'KEYDOWN':
+                    try:
+                        return self.keymap[event.sym]
+                    except KeyError as e:
+                        print('key not registered.', e)
+                        return (None, None, None)
 
-            elif event.type == 'QUIT':
-                # Halt the script using SystemExit
-                raise SystemExit('The window has been closed.')
+                elif event.type == 'QUIT':
+                    # Halt the script using SystemExit
+                    raise SystemExit('The window has been closed.')
 
-            return (None, None, None)
 
 
 class GameInput(InputHandler): 
@@ -61,24 +62,26 @@ class GameInput(InputHandler):
 
 class MenuInput(InputHandler): 
     def __init__(self):
-        self.vk = {
+        self.keymap = {
             # Arrowkeys
-            14: ('move',[-1],{}),      # up
-            15: ('move',[-1],{}),      # left
-            16: ('move', [1],{}),      # right
-            17: ('move', [1],{}),      # down
+            tcod.event.K_UP: ('move',[-1],{}),
+            tcod.event.K_LEFT: ('move',[-1],{}),
+            tcod.event.K_RIGHT: ('move',[1],{}),
+            tcod.event.K_DOWN: ('move',[1],{}),
             # Numpad
-            #35: 0 on numpad
-            36: ('move', [1],{}),           # down
-            38: ('move',[-1],{}),           # left
-            39: ('call_selected',[],{}),    # 5 numpad
-            40: ('move', [1],{}),           # right
-            42: ('move',[-1],{}),           # up
-            49: ('call_selected',[],{}),    # enter (numpad)
-        }
-        self.c = {
-            13: ('call_selected',[],{}),    # enter (main)
-            27: ('exit',[],{}),             # esc
+            tcod.event.K_KP_9: ('move',[-1],{}),
+            tcod.event.K_KP_8: ('move',[-1],{}),
+            tcod.event.K_KP_7: ('move',[-1],{}),
+            tcod.event.K_KP_6: ('move',[1],{}),
+            #tcod.event.K_KP_5: 5 on numpad
+            tcod.event.K_KP_4: ('move',[-1],{}),
+            tcod.event.K_KP_3: ('move',[1],{}),
+            tcod.event.K_KP_2: ('move',[1],{}),
+            tcod.event.K_KP_1: ('move',[1],{}),
+
+            tcod.event.K_RETURN: ('select',[],{}),
+            tcod.event.K_SPACE: ('select',[],{}),
+            tcod.event.K_ESCAPE: ('exit',[],{}),
         }    
 
 

@@ -38,7 +38,7 @@ class Map():
         return random.choice([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].blocked == False)])
 
     def fill_tiles(self):
-        self.tiles = LimitList([LimitList([el.wall() for y in range(self.width)]) for x in range(self.height)])
+        self.tiles = LimitList([LimitList([el.wall() for y in range(self.height)]) for x in range(self.width)])
     
     def random_tile_loc(self):
         x = random.randrange(0, (self.width))

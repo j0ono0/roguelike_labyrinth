@@ -1,13 +1,19 @@
 from collections import namedtuple
 import tcod.event
 
-SCREEN_WIDTH = 30
-SCREEN_HEIGHT = 30
+SCREEN_WIDTH = 100
+SCREEN_HEIGHT = 43
+
 # Map must be odd dimensions. 
 # This allows 100% fill with alternating corridor/walls
-MAP_WIDTH = 9
-MAP_HEIGHT = 9
-MAP_OFFSET = (3,1)
+MAP_WIDTH = 53
+MAP_HEIGHT = 39
+MAP_OFFSET = (3,2)
+
+# narrative window
+NAR_WIDTH = 39
+NAR_HEIGHT = 39
+NAR_OFFSET = (58,2)
 
 # Create a dictionary that maps keys to vectors.
 # Names of the available keys can be found in the online documentation:
@@ -25,6 +31,7 @@ ACTION_KEYS = {
 
 Obj = namedtuple('Obj', ['glyph','color', 'block_sight', 'block_motion'])
 ELEMENTS = {
+    'player':       Obj('@', [255, 255, 255], False, False),
     'ground':       Obj('.', [100, 100, 100], False, False),
     'stairs down':  Obj('>', [255, 255, 255], False, False),
     'stairs up':    Obj('<', [255, 255, 255], False, False),
