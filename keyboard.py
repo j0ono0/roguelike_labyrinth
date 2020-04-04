@@ -6,6 +6,29 @@
 import tcod
 from settings import *
 
+mod_keys = {
+    '1':'!',
+    '2':'@',
+    '3':'#',
+    '4':'$',
+    '5':'%',
+    '6':'^',
+    '7':'&',
+    '8':'*',
+    '9':'(',
+    '0':')',
+    '-':'_',
+    '=':'+',
+    '[':'{',
+    ']':'}',
+    '\\':'|',
+    ';':':',
+    "'":'"',
+    ',':'<',
+    '.':'>',
+    '/':'?',
+}
+
 class InputHandler:
     def capture_keypress(self):
         while True:
@@ -34,7 +57,7 @@ class CharInput:
                 if event.type == 'KEYDOWN':
                     try:
                         if event.mod & tcod.event.KMOD_SHIFT:
-                            return (chr(event.sym).upper())
+                            return mod_keys.get(chr(event.sym), chr(event.sym).upper())
                         return chr(event.sym)
                     except ValueError:
                         pass
@@ -147,21 +170,3 @@ class DirectionInput(InputHandler):
                 36: ('use_direction',[0,1],{}),      # down
                 35: ('use_direction',[-1,1],{}),     # down left
             }
-
-class alphaInput(InputHandler):
-    def __init__(self):
-        self.vk = {
-            49: ('select',[],{}),           # enter (numpad)
-        }
-        self.c = {
-            27:  ('yes', [], {}),       # esc
-            44:  (',', [], {}),         # ,
-            46:  ('.', [], {}),         # .
-            100: ('d', [], {}),         # d
-            105: ('i', [], {}),         # i
-            110: ('n', [], {}),         # n
-            114: ('r', [], {}),         # r
-            116: ('t', [], {}),         # t
-            117: ('u', [], {}),         # u
-            121: ('y', [], {}),         # y
-        }

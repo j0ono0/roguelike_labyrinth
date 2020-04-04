@@ -33,12 +33,16 @@ def astar(graph, start, end):
             return path
 
         for next in cardinal_neighbours(*current):
-            if next not in graph or graph[next].blocked:
-                continue
-            priority = cost_tally[current] + distance(end, next)
-            if next not in visited or priority < cost_tally[next]:
-                cost_tally[next] = priority
-                heapq.heappush(frontier, (priority, next))
-                visited[next] = current
+            x, y = next
+            try:
+                if graph[x][y].blocked == False:
+                    priority = cost_tally[current] + distance(end, next)
+                    if next not in visited or priority < cost_tally[next]:
+                        cost_tally[next] = priority
+                        heapq.heappush(frontier, (priority, next))
+                        visited[next] = current
+            except IndexError:
+                """ coordinates out of map area """
+            
     return []
     

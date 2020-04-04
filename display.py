@@ -17,6 +17,5 @@ console.default_bg = [0,0,0]
 console.default_bg_blend = 0
 
 def render_base():
-    console.clear()
     console.draw_frame(MAP_OFFSET[0] - 1, MAP_OFFSET[1] - 1, MAP_WIDTH + 2, MAP_HEIGHT + 2)
     console.draw_frame(NAR_OFFSET[0] - 1, NAR_OFFSET[1] - 1, NAR_WIDTH + 2, NAR_HEIGHT + 2)

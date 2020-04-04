@@ -55,14 +55,15 @@ class Inventory:
         ui.narrative.add('{} drops a {}.'.format(user.name, target.name))
 
 
-class Vision():
+class Perception():
     def __init__(self, vision, loc):
         self.vision = vision
         self.loc = loc
         self.fov = []
  
-    def scan(self, vismap):
+    def see(self, vismap):
         self.fov = field_of_view.scan(self.loc(), vismap, self.vision)
+
 
 
 ###################

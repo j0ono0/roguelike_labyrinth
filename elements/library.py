@@ -42,6 +42,6 @@ def locator(loc):
 
 def human(name, glyph, vision):
     b = entity.Entity(name, glyph)
-    setattr(b, 'percept', entity.Vision(vision, b.loc))
+    setattr(b, 'percept', entity.Perception(vision, b.loc))
     setattr(b, 'inventory', entity.Inventory(5))
     return b

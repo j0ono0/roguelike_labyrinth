@@ -36,6 +36,7 @@ ELEMENTS = {
     'stairs down':  Obj('>', [255, 255, 255], False, False),
     'stairs up':    Obj('<', [255, 255, 255], False, False),
     'wall':         Obj('#', [120, 120, 120], True,  True),
+    'locator':      Obj('+', [120, 150, 110], False, False),
     ## Elements that render if unseen ##
     'ground--unseen':   Obj('.', [50, 50, 50], False, False),
     'wall--unseen':     Obj('#', [70, 70, 70], True,  True),

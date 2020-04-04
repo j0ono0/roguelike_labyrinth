@@ -24,26 +24,24 @@ lvl.create(MAP_WIDTH, MAP_HEIGHT)
 player = el.human('player_01','@', 16)
 player.loc.update(lvl.env.random_unblocked_loc())
 
-# Update players field of view
-player.percept.scan(lvl.env.fov_array())
-lvl.update_seen(player.percept.fov)
-
 
 while True:
 
     # update player field of view
-    player.percept.scan(lvl.env.fov_array())
+    player.percept.see(lvl.env.fov_array())
     lvl.update_seen(player.percept.fov)
     
-    # Update console and render.
+    # Render game to screen
+    console.clear()
     display.render_base()
     
     lvl.blit(console, player.percept.fov)
     ui.narrative.blit(console)
     console.print(*(x + y for x, y in zip(MAP_OFFSET, player.loc())), player.glyph, ELEMENTS['player'].color)
+    
     tcod.console_flush()
     
-    # User input
+    # Process user input
     fn, args, kwargs = kb.capture_keypress()
     if fn == 'move':
         try:
@@ -78,3 +76,5 @@ while True:
         menu = ui.SelectMenu('Inventory', console)
         target = menu.select(player.inventory.items)
         player.inventory.drop(player, target, lvl)
+
+    
