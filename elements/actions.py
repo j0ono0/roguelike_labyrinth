@@ -1,6 +1,9 @@
+import tcod
 from settings import *
+from display import console
 from . import entity
 import interface as ui
+import keyboard
 
 
 class Interact:
@@ -39,3 +42,27 @@ class MoveToLevel:
                 lvl.env.entities.append(self.return_entity)
                 
 
+class DisplayEntity:
+    def __call__(self, user, target, lvl):
+        """
+        # Print pathfinding
+        for ex in lvl.exits():
+            if ex.glyph == '>':
+                color = [60,255,100]
+                glyph = '.'
+            else:
+                color = [255,100,100]
+                glyph = '.'
+            
+            for loc in lvl.find_path(player.loc(), ex.loc())[1:]:
+                lvl_con.print(*loc, glyph, color)
+        """
+        con = tcod.console.Console(NAR_WIDTH, NAR_HEIGHT, order="F")
+        kb = keyboard.CharInput()
+
+        con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, 'Type the symbol your seek.')
+        con.blit(console, *NAR_OFFSET, 0, 0, NAR_WIDTH+2, NAR_HEIGHT+2, 1, 1, 0)
+        tcod.console_flush()
+
+        char = kb.capture_keypress()
+        ui.narrative.add("The device searches for all '{}'".format(char))

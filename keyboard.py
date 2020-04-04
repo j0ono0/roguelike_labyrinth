@@ -24,6 +24,25 @@ class InputHandler:
                     # Halt the script using SystemExit
                     raise SystemExit('The window has been closed.')
 
+class CharInput:
+   
+    def capture_keypress(self):
+        while True:
+            # Wait for a key stroke
+            for event in tcod.event.wait():
+                # Return keyboard character
+                if event.type == 'KEYDOWN':
+                    try:
+                        if event.mod & tcod.event.KMOD_SHIFT:
+                            return (chr(event.sym).upper())
+                        return chr(event.sym)
+                    except ValueError:
+                        pass
+                    
+                elif event.type == 'QUIT':
+                    # Halt the script using SystemExit
+                    raise SystemExit('The window has been closed.')
+
 
 
 class GameInput(InputHandler): 

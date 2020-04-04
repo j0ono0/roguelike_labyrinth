@@ -50,9 +50,9 @@ def create(width, height):
     stairs_up = el.stairs_up(newid)
     stairs_down = el.stairs_down(newid+1, env.random_empty_loc(), stairs_up)
     # Populate environment with some items
-    thing = el.thingy(env.random_empty_loc())
+    locator = el.locator(env.random_empty_loc())
 
-    env.entities.extend([stairs_down, thing])
+    env.entities.extend([stairs_down, locator])
 
 
 def load(id):
