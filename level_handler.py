@@ -110,8 +110,8 @@ def blit(fov):
             elif t.seen:
                 key = t.kind + '--unseen'
                 disp.con.tiles[(x,y)] = (
-                    ord(ELEMENTS[key].glyph),
-                    ELEMENTS[key].color + [150],
+                    ord(t.glyph),
+                    ELEMENTS[key].fg + [255],
                     (*tcod.black, 255)
                 )
             
