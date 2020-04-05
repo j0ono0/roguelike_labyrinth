@@ -62,7 +62,7 @@ class DisplayEntity:
         for e in entities:
             for loc in lvl.find_path(user.loc(), e.loc())[1:]:
                 emap.con.print(*loc, '.', [200,255,0])
-            emap.con.print(*e.loc(), e.glyph, ELEMENTS[e.name].color)
+            emap.con.print(*e.loc(), e.glyph, e.fg)
         
         emap.blit(True)
         

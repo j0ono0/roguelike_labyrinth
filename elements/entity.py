@@ -6,6 +6,7 @@
 from collections import namedtuple
 import field_of_view
 import interface as ui 
+from settings import ELEMENTS
 
 
 ###################
@@ -65,6 +66,12 @@ class Perception():
         self.fov = field_of_view.scan(self.loc(), vismap, self.vision)
 
 
+class PersonalityA:
+   
+    def __call__(self, user, target, lvl):
+        pass
+
+
 
 ###################
 #
@@ -73,9 +80,12 @@ class Perception():
 ###################
 
 class Entity():
-    def __init__(self, name, glyph, loc=Location(), blocked=True, action=None):
+    def __init__(self, name, kind, loc=Location(), blocked=True, action=None):
         self.name = name
-        self.glyph = glyph
+        self.kind = kind
+        self.glyph = ELEMENTS[kind].glyph
+        self.fg = ELEMENTS[kind].fg
+        self.bg = [0, 0, 0]
         self.loc = loc
         self.blocked = blocked
         self.action = action
@@ -84,9 +94,12 @@ class Entity():
         return self.name
 
 class Tile:
-    def __init__(self, name, glyph, blocked, action):
+    def __init__(self, name, kind, blocked, action):
         self.name = name
-        self.glyph = glyph
+        self.kind = kind
+        self.glyph = ELEMENTS[kind].glyph
+        self.fg = ELEMENTS[kind].fg
+        self.bg = [0, 0, 0]
         self.blocked = blocked
         self.action = action
         self.seen = False    

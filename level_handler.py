@@ -52,6 +52,7 @@ def create(width, height):
     stairs_down = el.stairs_down(newid+1, env.random_empty_loc(), stairs_up)
     # Populate environment with some items
     locator = el.locator(env.random_empty_loc())
+    person = el.human('Jaffles', 'human')
 
     env.entities.extend([stairs_down, locator])
 
@@ -102,12 +103,12 @@ def blit(fov):
             t = env.tiles[x][y]
             if (x,y) in fov:
                 disp.con.tiles[(x,y)] = (
-                    ord(ELEMENTS[t.name].glyph),
-                    ELEMENTS[t.name].color + [255],
-                    (*tcod.black, 255)
+                    ord(ELEMENTS[t.kind].glyph),
+                    t.fg + [255],
+                    [8, 8, 8, 255]
                 )
             elif t.seen:
-                key = t.name + '--unseen'
+                key = t.kind + '--unseen'
                 disp.con.tiles[(x,y)] = (
                     ord(ELEMENTS[key].glyph),
                     ELEMENTS[key].color + [150],

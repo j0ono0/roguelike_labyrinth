@@ -21,7 +21,7 @@ print('Creating starting level')
 lvl.create(MAP_WIDTH, MAP_HEIGHT)
 
 # Setup player
-player = el.human('player_01','@', 16)
+player = el.human('Deckard', 'player')
 player.loc.update(lvl.env.random_unblocked_loc())
 
 while True:
@@ -36,7 +36,7 @@ while True:
     
     lvl.blit(player.percept.fov)
     ui.narrative.blit()
-    console.print(*(x + y for x, y in zip(MAP_OFFSET, player.loc())), player.glyph, ELEMENTS['player'].color)
+    console.print(*(x + y for x, y in zip(MAP_OFFSET, player.loc())), player.glyph, player.fg)
     
     tcod.console_flush()
     
