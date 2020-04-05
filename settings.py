@@ -1,7 +1,7 @@
 from collections import namedtuple
 import tcod.event
 
-SCREEN_WIDTH = 100
+SCREEN_WIDTH = 102
 SCREEN_HEIGHT = 43
 
 # Map must be odd dimensions. 
@@ -11,7 +11,7 @@ MAP_HEIGHT = 39
 MAP_OFFSET = (3,2)
 
 # narrative window
-NAR_WIDTH = 39
+NAR_WIDTH = 40
 NAR_HEIGHT = 39
 NAR_OFFSET = (58,2)
 

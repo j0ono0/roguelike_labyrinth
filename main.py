@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import random
 import tcod
-import display
-from display import console
+import consoles
+from consoles import root_console as console
 from elements import library as el
 import level_handler as lvl
 import keyboard
@@ -24,7 +24,6 @@ lvl.create(MAP_WIDTH, MAP_HEIGHT)
 player = el.human('player_01','@', 16)
 player.loc.update(lvl.env.random_unblocked_loc())
 
-
 while True:
 
     # update player field of view
@@ -33,10 +32,10 @@ while True:
     
     # Render game to screen
     console.clear()
-    display.render_base()
+    consoles.render_base()
     
-    lvl.blit(console, player.percept.fov)
-    ui.narrative.blit(console)
+    lvl.blit(player.percept.fov)
+    ui.narrative.blit()
     console.print(*(x + y for x, y in zip(MAP_OFFSET, player.loc())), player.glyph, ELEMENTS['player'].color)
     
     tcod.console_flush()
@@ -56,7 +55,7 @@ while True:
             ui.narrative.add('There is no way through here!')
 
     elif fn == 'use':
-        menu = ui.SelectMenu('Inventory', console)
+        menu = ui.SelectMenu('Inventory')
         target = menu.select(player.inventory.items) or lvl.get_target(player.loc())
         try:
             target.action(player, target, lvl)
@@ -73,7 +72,7 @@ while True:
             ui.narrative.add('There is nothing here to pickup.')
 
     elif fn == 'drop_select':
-        menu = ui.SelectMenu('Inventory', console)
+        menu = ui.SelectMenu('Inventory')
         target = menu.select(player.inventory.items)
         player.inventory.drop(player, target, lvl)
 

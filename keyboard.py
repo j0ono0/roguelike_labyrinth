@@ -115,7 +115,7 @@ class MenuInput(InputHandler):
             tcod.event.K_KP_8: ('move',[-1],{}),
             tcod.event.K_KP_7: ('move',[-1],{}),
             tcod.event.K_KP_6: ('move',[1],{}),
-            #tcod.event.K_KP_5: 5 on numpad
+            tcod.event.K_KP_5: ('select',[],{}),
             tcod.event.K_KP_4: ('move',[-1],{}),
             tcod.event.K_KP_3: ('move',[1],{}),
             tcod.event.K_KP_2: ('move',[1],{}),

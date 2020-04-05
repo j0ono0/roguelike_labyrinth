@@ -6,10 +6,11 @@ Dashboard interface components
 from collections import deque
 import tcod
 import keyboard
+import consoles
 from settings import *
 
 
-class NarrativeConsole:
+class Narrative:
     def __init__(self):
         self.history = deque(['Monkey was born form a stone egg.'],100)
         self.queue = [
@@ -19,28 +20,27 @@ class NarrativeConsole:
             "',' pickup item.",
             "'d' drop item.",
         ]
-        self.con = tcod.console.Console(NAR_WIDTH+2, NAR_HEIGHT+2, order="F")
 
     def add(self, msg):
         self.queue.append(msg)
 
-    def blit(self, console):
+    def blit(self):
+        disp = consoles.NarrativeConsole()
+        disp.clear()
         y = 0
-        con = tcod.console.Console(NAR_WIDTH, NAR_HEIGHT)
         while self.queue:
-            y = y + 1 + con.print_box(1, y, NAR_WIDTH-1, NAR_HEIGHT, self.queue[0])
+            y = y + 1 + disp.con.print_box(1, y, NAR_WIDTH-1, NAR_HEIGHT, self.queue[0], [255, 255, 255], [0, 0, 0])
             self.history.appendleft(self.queue.pop(0))
 
-        con.blit(console, *NAR_OFFSET, 0, 0, NAR_WIDTH+2, NAR_HEIGHT+2, 1, 0, 0)
+        disp.blit()
 
 
 class SelectMenu:
     """
     Display a list of option for a user to select from
     """
-    def __init__(self, title, console):
+    def __init__(self, title):
         self.title = title
-        self.console = console
 
     @staticmethod
     def move(index, direction, max_index):
@@ -48,15 +48,15 @@ class SelectMenu:
 
 
     def select(self, options):
-        
-        con = tcod.console.Console(NAR_WIDTH, NAR_HEIGHT, order="F")
+        disp = consoles.NarrativeConsole()
+
         kb = keyboard.MenuInput()
         index = 0
         selection = None
         
         while selection == None:
             
-            con.print(1, 0, 'Inventory')
+            disp.con.print(1, 0, 'Inventory')
             y = 2
             for i, option in enumerate(options):
                 if i == index:
@@ -66,10 +66,9 @@ class SelectMenu:
                     fg = [255,255,255]
                     bg = [0,0,0]
                     
-                y = y + con.print_box(1, y, NAR_WIDTH, 10, option.name, fg, bg)
+                y = y + disp.con.print_box(1, y, NAR_WIDTH, 10, option.name, fg, bg)
 
-            con.blit(self.console, *NAR_OFFSET)
-            tcod.console_flush()
+            disp.blit(True)
             
             fn, args, kwargs = kb.capture_keypress()
             if fn == 'move':
@@ -83,4 +82,4 @@ class SelectMenu:
 
 #################
 
-narrative = NarrativeConsole()
+narrative = Narrative()

@@ -1,5 +1,6 @@
 import os, pickle, re
 import tcod
+import consoles
 from levels import environment
 from pathfinding import astar
 from settings import *
@@ -88,24 +89,26 @@ def get_tile(loc):
     return env.tiles[x][y]
     
 def find_path(start, end):
-    return astar(env.tiles, start, end)
+    return astar(env.fov_array(), start, end)
 
 
-def blit(console, fov):
+def blit(fov):
+    disp = consoles.EnvironmentConsole()
+
     con = tcod.console.Console(env.width, env.height, order="F")
     # Add env tiles to console
     for x in range(MAP_WIDTH): 
         for y in range(MAP_HEIGHT):
             t = env.tiles[x][y]
             if (x,y) in fov:
-                con.tiles[(x,y)] = (
+                disp.con.tiles[(x,y)] = (
                     ord(ELEMENTS[t.name].glyph),
                     ELEMENTS[t.name].color + [255],
                     (*tcod.black, 255)
                 )
             elif t.seen:
                 key = t.name + '--unseen'
-                con.tiles[(x,y)] = (
+                disp.con.tiles[(x,y)] = (
                     ord(ELEMENTS[key].glyph),
                     ELEMENTS[key].color + [150],
                     (*tcod.black, 255)
@@ -114,7 +117,7 @@ def blit(console, fov):
     # Add entities to console
     for e in env.entities:
         if e.loc() in fov:
-            con.print_(*e.loc(), e.glyph)
+            disp.con.print_(*e.loc(), e.glyph)
 
-    con.blit(console, *MAP_OFFSET, 0, 0, MAP_WIDTH+2, MAP_HEIGHT+2, 1, 0, 0)
+    disp.blit()
 
