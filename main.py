@@ -21,8 +21,7 @@ print('Creating starting level')
 lvl.create(MAP_WIDTH, MAP_HEIGHT)
 
 # Setup player
-player = el.human('Deckard', 'player')
-player.loc.update(lvl.env.random_unblocked_loc())
+player = el.player_character('Deckard', lvl.env.random_unblocked_loc())
 
 while True:
 
@@ -76,4 +75,10 @@ while True:
         target = menu.select(player.inventory.items)
         player.inventory.drop(player, target, lvl)
 
-    
+    # All other entities and events occur
+    # TODO: roll initiative
+    for e in lvl.env.entities:
+        try:
+            e.ai(e, lvl)
+        except AttributeError:
+            """ this entity has no personality """

@@ -66,10 +66,7 @@ class Perception():
         self.fov = field_of_view.scan(self.loc(), vismap, self.vision)
 
 
-class PersonalityA:
-   
-    def __call__(self, user, target, lvl):
-        pass
+    
 
 
 
@@ -102,6 +99,6 @@ class Tile:
         self.bg = [0, 0, 0]
         self.blocked = blocked
         self.action = action
-        self.seen = False    
+        self.seen = False
 
 

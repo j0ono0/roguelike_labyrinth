@@ -31,12 +31,12 @@ ACTION_KEYS = {
 
 Obj = namedtuple('Obj', ['glyph','fg', 'block_sight', 'block_motion'])
 ELEMENTS = {
-    'player':       Obj('@', [255, 255, 255], False, False),
-    'human':        Obj('@', [220, 220, 220], False, False),
-    'ground':       Obj('.', [100, 100, 100], False, False),
-    'stairs_down':  Obj('>', [255, 255, 255], False, False),
-    'stairs_up':    Obj('<', [255, 255, 255], False, False),
-    'wall':         Obj('#', [120, 120, 120], True,  True),
+    'player_character': Obj('@', [255, 255, 255], False, True),
+    'human':            Obj('@', [160, 160, 160], False, True),
+    'ground':           Obj('.', [100, 100, 100], False, False),
+    'stairs_down':      Obj('>', [255, 255, 255], False, False),
+    'stairs_up':        Obj('<', [255, 255, 255], False, False),
+    'wall':             Obj('#', [120, 120, 120], True,  True),
     'tech_device':      Obj('+', [120, 150, 110], False, False),
     ## Elements that render if unseen ##
     'ground--unseen':   Obj('.', [50, 50, 50], False, False),

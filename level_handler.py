@@ -5,6 +5,7 @@ from levels import environment
 from pathfinding import astar
 from settings import *
 from elements import library as el
+from elements import entity
 
 
 #################
@@ -45,16 +46,17 @@ def create(width, height):
         env = environment.MazeMap(width, height, id=newid)
     except ValueError:
         newid = 1
-        env = environment.BigRoom(width, height, id=newid)
+        #env = environment.BigRoom(width, height, id=newid)
+        env = environment.ClassicDungeon(width, height, id=newid)
 
     # Populate environment with some exits
     stairs_up = el.stairs_up(newid)
     stairs_down = el.stairs_down(newid+1, env.random_empty_loc(), stairs_up)
     # Populate environment with some items
     locator = el.locator(env.random_empty_loc())
-    person = el.human('Jaffles', 'human')
+    person = el.human('Jaffles', env.random_empty_loc())
 
-    env.entities.extend([stairs_down, locator])
+    env.entities.extend([stairs_down, locator, person])
 
 
 def load(id):

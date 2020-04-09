@@ -65,7 +65,20 @@ class DisplayEntity:
             emap.con.print(*e.loc(), e.glyph, e.fg)
         
         emap.blit(True)
-        
+            
         # Pause before returning to game loop
         char = kb.capture_keypress()
         
+
+class PersonalityA:
+    def __init__(self):
+        self.path = []
+
+    def __call__(self, target, lvl):
+        if len(self.path) > 0:
+            target.loc.update(self.path.pop())
+
+    def flee(self, user, target, lvl):
+        ui.narrative.add('The {} menaces a {}'.format(user.kind, target.kind))
+        ui.narrative.add('The {} flees!'.format(target.kind))
+        self.path = lvl.find_path(target.loc(), lvl.env.random_empty_loc())
