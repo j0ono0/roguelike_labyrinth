@@ -32,6 +32,7 @@ class MoveToLevel:
 
     def __call__(self, user, target, lvl):
         lvl.save()
+        
         try:
             lvl.load(self.env_id)
             print(f'level {lvl.env.id} loaded')
@@ -41,6 +42,8 @@ class MoveToLevel:
             if self.return_entity:
                 self.return_entity.loc.update(user.loc())
                 lvl.env.entities.append(self.return_entity)
+        
+        lvl.env.entities.append(user)
                 
 
 class DisplayEntity:
@@ -61,7 +64,8 @@ class DisplayEntity:
 
         entities = [e for e in lvl.env.entities if e.glyph == char]
         for e in entities:
-            for loc in lvl.find_path(user.loc(), e.loc())[1:]:
+            path = lvl.find_path(user.loc(), e.loc())
+            for loc in path[1:]:
                 emap.con.print(*loc, '.', [200,255,0])
             emap.con.print(*e.loc(), e.glyph, e.fg)
         
@@ -138,7 +142,7 @@ class PlayerInput:
                 ui.narrative.add('You see no way to use the {}.'.format(target.name))
 
         elif fn == 'pickup_select':
-            targets = [t for t in lvl.env.entities if t.loc() == user.loc()]
+            targets = [t for t in lvl.env.entities if t.loc() == user.loc() and t != user]
             if len(targets) > 1:
                 """ display select menu here """
             elif len(targets) == 1:

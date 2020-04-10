@@ -73,6 +73,8 @@ def load(id):
     
 
 def save():
+    # remove PCs before saving
+    env.entities = [e for e in env.entities if e.kind != 'player_character']
     filepath = os.path.join('gamedata', f'{lvl_prefix}{env.id}.pickle')
     with open(filepath, 'wb') as f:
         pickle.dump(env, f)
