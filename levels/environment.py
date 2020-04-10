@@ -67,29 +67,34 @@ class Map():
 class BigRoom(Map):
     def __init__(self, width, height, id=0):
         super().__init__(width, height, id)
-        self.build()
 
-    def build(self):
+    def build(self, entry_loc=None):
         self.fill_tiles()
         for x, y in [(x,y) for x in range(1, self.width - 1) for y in range(1, self.height - 1)]:
             self.tiles[x][y] = el.ground((x,y))
 
 
-class ClassicDungeon(Map):
+class BasicDungeon(Map):
     def __init__(self, width, height, id=0):
         super().__init__(width, height, id)
         self.rooms = []
-        self.min_size = 3
-        self.max_size = 30
+        self.min_size = 4
+        self.max_size = 15
         self.max_rooms = 10
-
-        self.build()
     
     def create_room(self, room):
         for x in range(room.x1 + 1, room.x2):
             for y in range(room.y1 + 1, room.y2):
                 self.tiles[x][y] = el.ground((x,y))
     
+    def create_room_at(self, loc):
+            x, y = loc
+            w = random.randint(self.min_size, self.max_size)
+            h = random.randint(self.min_size, self.max_size)
+            x = x - w // 2
+            y = y - h // 2
+            self.rooms.append(Rect(x, y, w, h))
+
     def create_h_tunnel(self, x1, x2, y):
         for x in range(min(x1, x2), max(x1, x2) + 1):
             self.tiles[x][y] = el.ground((x,y))
@@ -98,8 +103,13 @@ class ClassicDungeon(Map):
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.tiles[x][y] = el.ground((x,y))
 
-    def build(self):
+    def build(self, entry_loc=None):
         self.fill_tiles()
+        try:
+            self.create_room_at(entry_loc)
+        except TypeError: 
+            """ no loc provided """
+
         for r in range(self.max_rooms):
             w = random.randint(self.min_size, self.max_size)
             h = random.randint(self.min_size, self.max_size)
@@ -110,15 +120,22 @@ class ClassicDungeon(Map):
             if len([r for r in self.rooms if r.intersects(rm)]) == 0:
                 self.rooms.append(rm)
         
-        for r in self.rooms:
+        for i, r in enumerate(self.rooms):
             self.create_room(r)
+            try:
+                x1, y1 = r.center()
+                x2, y2 = self.rooms[i+1].center()
+                self.create_h_tunnel(x1, x2, y1)
+                self.create_v_tunnel(y1, y2, x2)
+            except IndexError:
+                pass
+
 
 
 
 class MazeMap(Map):
     def __init__(self, width, height, id=0):
         super().__init__(width, height, id)
-        self.build()
     
     def random_unblocked_loc(self):
         # Select from only even x/y tiles locations
@@ -157,7 +174,7 @@ class MazeMap(Map):
 
         return graph
 
-    def build(self):
+    def build(self, entry_loc=None):
         if self.width % 2 == 0 or self.height % 2 == 0:
             raise ValueError('mazeMap must be odd width and height.')
         # Build new graph and clear existing tiles

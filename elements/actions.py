@@ -36,7 +36,7 @@ class MoveToLevel:
             print(f'level {lvl.env.id} loaded')
         except FileNotFoundError:
             print('Level not found. Creating new level')
-            lvl.create(MAP_WIDTH, MAP_HEIGHT)
+            lvl.create(MAP_WIDTH, MAP_HEIGHT, user.loc())
             if self.return_entity:
                 self.return_entity.loc.update(user.loc())
                 lvl.env.entities.append(self.return_entity)

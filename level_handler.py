@@ -35,7 +35,7 @@ def instantiate_env(env_id):
         print('Level not found. Creating new level')
         create(MAP_WIDTH, MAP_HEIGHT)
 
-def create(width, height):
+def create(width, height, entry_loc=None):
     global env
     #find highest id in gamedata
     filenames = os.listdir('gamedata')
@@ -43,12 +43,18 @@ def create(width, height):
     ids = [int(p.search(i).group('id')) for i in filenames]
     try:
         newid = max(ids) + 1
-        env = environment.MazeMap(width, height, id=newid)
+        if newid < 4:
+            env = environment.BasicDungeon(width, height, id=newid)
+        elif newid < 5:
+            env = environment.MazeMap(width, height, id=newid)
+        else:
+            env = environment.BigRoom(width, height, id=newid)
     except ValueError:
         newid = 1
-        #env = environment.BigRoom(width, height, id=newid)
-        env = environment.ClassicDungeon(width, height, id=newid)
+        env = environment.BasicDungeon(width, height, id=newid)
 
+    env.build(entry_loc)
+    
     # Populate environment with some exits
     stairs_up = el.stairs_up(newid)
     stairs_down = el.stairs_down(newid+1, env.random_empty_loc(), stairs_up)
