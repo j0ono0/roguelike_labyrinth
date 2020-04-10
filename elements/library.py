@@ -47,7 +47,9 @@ def player_character(name, loc):
     max_vision = max(MAP_WIDTH, MAP_HEIGHT)
     setattr(b, 'percept', entity.Perception(max_vision, b.loc))
     setattr(b, 'inventory', entity.Inventory(10))
+    setattr(b, 'perform', actions.PlayerInput())
     b.inventory.items.append(locator(b.loc))
+    b.action = actions.BlockUser()
     return b
 
 def human(name, loc):
@@ -55,7 +57,7 @@ def human(name, loc):
     max_vision = max(MAP_WIDTH, MAP_HEIGHT)
     setattr(b, 'percept', entity.Perception(max_vision, b.loc))
     setattr(b, 'inventory', entity.Inventory(10))
-    setattr(b, 'ai', actions.PersonalityA())
-    b.action = b.ai.flee
+    setattr(b, 'perform', actions.PersonalityA())
+    b.action = b.perform.flee
         
     return b

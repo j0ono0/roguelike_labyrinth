@@ -1,6 +1,7 @@
 import tcod
 from settings import *
 import consoles
+from consoles import root_console as console
 from . import entity
 import interface as ui
 import keyboard
@@ -74,11 +75,78 @@ class PersonalityA:
     def __init__(self):
         self.path = []
 
-    def __call__(self, target, lvl):
+    def __call__(self, user, lvl):
+        
+        # TODO: stop from walking through blocking entities
+
         if len(self.path) > 0:
-            target.loc.update(self.path.pop())
+            loc = self.path.pop()
+            target = lvl.get_target(loc, True)
+            try:
+                target.action(user, target, lvl)
+            except AttributeError:
+                ui.narrative.add('A {} blocks the {}\'s way.'.format(target.kind, user.kind))
+            
+            # replace loc if entity was unable to move
+            if user.loc() != loc:
+                self.path.append(loc)
 
     def flee(self, user, target, lvl):
         ui.narrative.add('The {} menaces a {}'.format(user.kind, target.kind))
         ui.narrative.add('The {} flees!'.format(target.kind))
         self.path = lvl.find_path(target.loc(), lvl.env.random_empty_loc())
+
+
+class PlayerInput:
+    def __call__(self, user, lvl):
+
+        # update player field of view
+        user.percept.see(lvl.env.fov_array())
+        lvl.update_seen(user.percept.fov)
+        
+        # Render game to screen
+        console.clear()
+        consoles.render_base()
+        
+        lvl.blit(user.percept.fov)
+        ui.narrative.blit()
+        console.print(*(x + y for x, y in zip(MAP_OFFSET, user.loc())), user.glyph, user.fg)
+        
+        tcod.console_flush()
+
+        kb = keyboard.GameInput()
+        # Process user input
+        fn, args, kwargs = kb.capture_keypress()
+        if fn == 'move':
+            try:
+                loc = user.loc.proposed(args)
+                target = lvl.get_target(loc, True)
+                try:
+                    target.action(user, target, lvl)
+                except AttributeError:
+                    ui.narrative.add('The {} blocks your way.'.format(target.name))
+            except IndexError as e:
+                # Player reached edge of environment
+                ui.narrative.add('There is no way through here!')
+
+        elif fn == 'use':
+            menu = ui.SelectMenu('Inventory')
+            target = menu.select(user.inventory.items) or lvl.get_target(user.loc())
+            try:
+                target.action(user, target, lvl)
+            except AttributeError:
+                ui.narrative.add('You see no way to use the {}.'.format(target.name))
+
+        elif fn == 'pickup_select':
+            targets = [t for t in lvl.env.entities if t.loc() == user.loc()]
+            if len(targets) > 1:
+                """ display select menu here """
+            elif len(targets) == 1:
+                user.inventory.pickup(user, targets.pop(), lvl)
+            else:
+                ui.narrative.add('There is nothing here to pickup.')
+
+        elif fn == 'drop_select':
+            menu = ui.SelectMenu('Inventory')
+            target = menu.select(user.inventory.items)
+            user.inventory.drop(user, target, lvl)

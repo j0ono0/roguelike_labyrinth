@@ -46,7 +46,8 @@ class Map():
         self.entities = []
     
     def fov_array(self):
-        return {(x,y): self.tiles[x][y].blocked == False for x in range(self.width) for y in range(self.height)}
+        blocked = [e.loc() for e in self.entities if e.blocked]
+        return {(x,y): self.tiles[x][y].blocked == False and (x,y) not in blocked for x in range(self.width) for y in range(self.height)}
 
     def random_empty_loc(self):
         entity_locs = set([e.loc for  e in self.entities])
