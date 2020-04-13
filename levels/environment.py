@@ -46,15 +46,15 @@ class Map():
         self.entities = []
     
     def fov_array(self):
-        return {(x,y): self.tiles[x][y].blocked == False for x in range(self.width) for y in range(self.height)}
+        return {(x,y): self.tiles[x][y].block.sight == False for x in range(self.width) for y in range(self.height)}
 
     def random_empty_loc(self):
         entity_locs = set([e.loc for  e in self.entities])
-        unblocked_locs = set([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].blocked == False)])
+        unblocked_locs = set([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].block.motion == False)])
         return random.choice(list(unblocked_locs.difference(entity_locs)))
 
     def random_unblocked_loc(self):
-        return random.choice([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].blocked == False)])
+        return random.choice([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].block.motion == False)])
 
     def fill_tiles(self):
         self.tiles = LimitList([LimitList([el.wall() for y in range(self.height)]) for x in range(self.width)])

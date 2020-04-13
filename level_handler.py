@@ -91,9 +91,9 @@ def update_seen(vismap):
         env.tiles[x][y].seen = True
 
 
-def get_target(loc, blocked=False):
+def get_target(loc, block_motion=False):
     # Return first item (or tile) at location
-    return next(iter([e for e in env.entities if e.loc() == loc and e.blocked == blocked]), get_tile(loc))
+    return next(iter([e for e in env.entities if e.loc() == loc and e.block.motion == block_motion]), get_tile(loc))
 
 def get_tile(loc):
     x, y = loc
@@ -113,22 +113,24 @@ def blit(fov):
             t = env.tiles[x][y]
             if (x,y) in fov:
                 disp.con.tiles[(x,y)] = (
-                    ord(ELEMENTS[t.kind].glyph),
+                    ord(t.glyph),
                     t.fg + [255],
-                    [8, 8, 8, 255]
+                    t.bg + [255]
                 )
             elif t.seen:
-                key = t.kind + '--unseen'
+                # Reduce color by 50% for unseen tiles
+                fg = [c*.5 for c in t.fg]
+                bg = [c*.5 for c in t.bg]
                 disp.con.tiles[(x,y)] = (
                     ord(t.glyph),
-                    ELEMENTS[key].fg + [255],
-                    (*tcod.black, 255)
+                    fg + [255],
+                    bg + [255]
                 )
             
     # Add entities to console
     for e in env.entities:
         if e.loc() in fov:
-            disp.con.print_(*e.loc(), e.glyph)
+            disp.con.print(*e.loc(), e.glyph, e.fg)
 
     disp.blit()
 

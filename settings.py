@@ -29,16 +29,13 @@ ACTION_KEYS = {
     tcod.event.K_SPACE: True
 }
 
-Obj = namedtuple('Obj', ['glyph','fg', 'block_sight', 'block_motion'])
+Obj = namedtuple('Obj', ['glyph','fg', 'bg', 'block_motion', 'block_sight'])
 ELEMENTS = {
-    'player_character': Obj('@', [255, 255, 255], False, True),
-    'human':            Obj('@', [160, 160, 160], False, True),
-    'ground':           Obj('.', [100, 100, 100], False, False),
-    'stairs_down':      Obj('>', [255, 255, 255], False, False),
-    'stairs_up':        Obj('<', [255, 255, 255], False, False),
-    'wall':             Obj('#', [120, 120, 120], True,  True),
-    'tech_device':      Obj('+', [120, 150, 110], False, False),
-    ## Elements that render if unseen ##
-    'ground--unseen':   Obj('.', [50, 50, 50], False, False),
-    'wall--unseen':     Obj('#', [70, 70, 70], True,  True),
+    'player_character': Obj('@', [255, 255, 255], [0, 0, 0],  True, False),
+    'human':            Obj('@', [200, 160, 120], [0, 0, 0],  True, False),
+    'stairs_down':      Obj('>', [255, 255, 255], [0, 0, 0], False, False),
+    'stairs_up':        Obj('<', [255, 255, 255], [0, 0, 0], False, False),
+    'tech_device':      Obj('+', [120, 150, 110], [0, 0, 0], False, False),
+    'ground':           Obj('.', [60, 60, 60], [25, 25, 25], False, False),
+    'wall':             Obj('#', [120, 120, 120], [25, 25, 25], True,  True),
 }

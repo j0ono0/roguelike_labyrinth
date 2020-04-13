@@ -76,28 +76,30 @@ class Perception():
 #
 ###################
 
+Block = namedtuple('Block', ['motion', 'sight'])
+
 class Entity():
-    def __init__(self, name, kind, loc=Location(), blocked=True, action=None):
+    def __init__(self, name, kind, loc=Location(), action=None):
         self.name = name
         self.kind = kind
+        self.loc = loc
+        self.action = action
         self.glyph = ELEMENTS[kind].glyph
         self.fg = ELEMENTS[kind].fg
-        self.bg = [0, 0, 0]
-        self.loc = loc
-        self.blocked = blocked
-        self.action = action
+        self.bg = ELEMENTS[kind].bg
+        self.block = Block(ELEMENTS[kind].block_motion, ELEMENTS[kind].block_sight)
 
     def __str__(self):
         return self.name
 
 class Tile:
-    def __init__(self, name, kind, blocked, action):
+    def __init__(self, name, kind, action):
         self.name = name
         self.kind = kind
         self.glyph = ELEMENTS[kind].glyph
         self.fg = ELEMENTS[kind].fg
-        self.bg = [0, 0, 0]
-        self.blocked = blocked
+        self.bg = ELEMENTS[kind].bg
+        self.block = Block(ELEMENTS[kind].block_motion, ELEMENTS[kind].block_sight)
         self.action = action
         self.seen = False
 
