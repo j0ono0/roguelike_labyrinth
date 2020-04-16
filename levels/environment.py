@@ -37,7 +37,7 @@ class Rect:
                 self.y1 <= other.y2 and self.y2 >= other.y1)
 
 
-class Map():
+class Terrain():
     def __init__(self, width, height, id=0):
         self.id = id
         self.width = width
@@ -67,7 +67,7 @@ class Map():
         y = random.randrange(0, (self.height))
         return Location(x, y)
 
-class BigRoom(Map):
+class BigRoom(Terrain):
     def __init__(self, width, height, id=0):
         super().__init__(width, height, id)
 
@@ -77,7 +77,7 @@ class BigRoom(Map):
             self.tiles[x][y] = el.ground((x,y))
 
 
-class BasicDungeon(Map):
+class BasicDungeon(Terrain):
     def __init__(self, width, height, id=0):
         super().__init__(width, height, id)
         self.rooms = []
@@ -136,7 +136,7 @@ class BasicDungeon(Map):
 
 
 
-class MazeMap(Map):
+class MazeMap(Terrain):
     def __init__(self, width, height, id=0):
         super().__init__(width, height, id)
     

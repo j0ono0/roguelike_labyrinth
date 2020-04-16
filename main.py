@@ -2,7 +2,7 @@
 import random
 import tcod
 from elements import library as el
-import level_handler as lvl
+from levels import level_handler as lvl
 import keyboard
 import interface as ui
 from settings import *
