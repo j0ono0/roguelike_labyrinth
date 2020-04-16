@@ -35,35 +35,36 @@ class Location:
 
 
 class Inventory:
-    def __init__(self, max):
-        self.items = []
+    def __init__(self, parent, max):
+        self.parent = parent
         self.max = max
+        self.items = []
 
     def add(self, item):
         self.items.insert(0, item)
 
-    def pickup(self, user, target, lvl):
+    def pickup(self, target, lvl):
         e = lvl.env.entities
         i = e.index(target)
         self.add(e.pop(i))
-        target.loc = user.loc
-        ui.narrative.add('{} picks up a {}.'.format(user.name, target.name))
+        target.loc = self.parent.loc
+        ui.narrative.add('{} picks up a {}.'.format(self.parent.kind, target.kind))
 
-    def drop(self, user, target, lvl):
+    def drop(self, target, lvl):
         i = self.items.index(target)
         target.loc = Location(target.loc())
         lvl.env.entities.append(self.items.pop(i))
-        ui.narrative.add('{} drops a {}.'.format(user.name, target.name))
+        ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
 
 
 class Perception():
-    def __init__(self, vision, loc):
-        self.vision = vision
-        self.loc = loc
+    def __init__(self, parent, max_vision):
+        self.max_vision = max_vision
+        self.loc = parent.loc
         self.fov = []
  
-    def see(self, vismap):
-        self.fov = field_of_view.scan(self.loc(), vismap, self.vision)
+    def see(self, terrain):
+        self.fov = field_of_view.scan(self.loc(), terrain, self.max_vision)
 
 
     
@@ -79,28 +80,39 @@ class Perception():
 Block = namedtuple('Block', ['motion', 'sight'])
 
 class Entity():
-    def __init__(self, name, kind, loc=Location(), action=None):
+    def __init__(self, name, kind, loc=Location(), abilities={}):
         self.name = name
         self.kind = kind
         self.loc = loc
-        self.action = action
         self.glyph = ELEMENTS[kind].glyph
         self.fg = ELEMENTS[kind].fg
         self.bg = ELEMENTS[kind].bg
         self.block = Block(ELEMENTS[kind].block_motion, ELEMENTS[kind].block_sight)
-
+        # Create properties for all kwargs
+        for name, ability in abilities.items():
+            self.add_ability(name, ability)
+        
     def __str__(self):
         return self.name
 
+    def add_ability(self, name, ability):
+        fn, args = ability
+        setattr(self, name, fn(self, *args))
+
 class Tile:
-    def __init__(self, name, kind, action):
+    def __init__(self, name, kind, abilities):
         self.name = name
         self.kind = kind
         self.glyph = ELEMENTS[kind].glyph
         self.fg = ELEMENTS[kind].fg
         self.bg = ELEMENTS[kind].bg
         self.block = Block(ELEMENTS[kind].block_motion, ELEMENTS[kind].block_sight)
-        self.action = action
         self.seen = False
-
-
+        
+        # Create properties for all kwargs
+        for name, ability in abilities.items():
+            self.add_ability(name, ability)
+        
+    def add_ability(self, name, ability):
+        fn, args = ability
+        setattr(self, name, fn(self, *args))
