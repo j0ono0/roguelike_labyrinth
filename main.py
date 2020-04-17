@@ -5,7 +5,6 @@ from elements import library as el
 from environment import environment_manager as em
 import keyboard
 import interface as ui
-from settings import *
 # Setup keyboard input
 kb = keyboard.GameInput()
 

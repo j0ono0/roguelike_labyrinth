@@ -39,7 +39,7 @@ def astar(graph, start, end):
             #path.append(start)
             return path
 
-        for loc in cardinal_neighbours(*current):
+        for loc in neighbours(graph, *current):
             try:
                 if graph[loc] == True:
                     priority = cost_tally[current] + distance(end, loc)

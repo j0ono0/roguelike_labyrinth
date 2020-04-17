@@ -58,11 +58,6 @@ class Terrain():
         x, y = loc
         return self.tiles[x][y]
     
-    def random_tile_loc(self):
-        x = random.randrange(0, (self.width))
-        y = random.randrange(0, (self.height))
-        return Location(x, y)
-    
     def mark_as_seen(self, locs):
         for loc in locs:
             x, y = loc
@@ -70,7 +65,7 @@ class Terrain():
 
 class BigRoom(Terrain):
     def __init__(self, id=0):
-        super().__init__(width, height, id)
+        super().__init__(id)
 
     def build(self, entry_loc=None):
         self.fill_tiles()
@@ -144,17 +139,18 @@ class MazeMap(Terrain):
         # ensures location will be unblocked on new maze levels
         return random.choice([(x * 2, y * 2) for x in range(self.width//2) for y in range(self.height//2)])
 
-    def cardinal_neighbours(self, loc, x_max, y_max):
+    def cardinal_neighbours(self, loc):
         x, y = loc
         locs = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
         while locs:
             # Return in random order
             x, y = locs.pop(random.randint(0, len(locs)-1))
-            if 0 <= x < x_max and 0 <= y < y_max:
+            if 0 <= x < MAP_WIDTH and 0 <= y < MAP_HEIGHT:
                 yield Location(x, y) 
 
     def build_graph(self, width, height):
-        sx, sy = self.random_tile_loc()
+        sx = random.randrange(0, (self.width))
+        sy = random.randrange(0, (self.height))
         start = Location(sx // 2, sy // 2)
         graph = {}
         frontier = set([start])
@@ -166,7 +162,7 @@ class MazeMap(Terrain):
             loc = random.sample(frontier, 1)[0]
             visited.add(loc)
             frontier.remove(loc)
-            for n in self.cardinal_neighbours(loc, width, height):
+            for n in self.cardinal_neighbours(loc):
                 if n in graph and not connected:
                     graph[loc] = set([n])
                     graph[n].add(loc)

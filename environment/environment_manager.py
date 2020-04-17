@@ -91,9 +91,9 @@ def random_empty_loc():
     unblocked_locs = set([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])
     return random.choice(list(unblocked_locs.difference(entity_locs)))
 
+
 def random_unblocked_loc():
     return random.choice([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])
-
 
 
 def blit(fov):
@@ -126,4 +126,3 @@ def blit(fov):
             disp.con.print(*e.loc(), e.glyph, e.fg)
 
     disp.blit()
-
