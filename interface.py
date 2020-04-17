@@ -25,14 +25,14 @@ class Narrative:
         self.queue.append(msg)
 
     def blit(self):
-        disp = consoles.NarrativeConsole()
-        disp.clear()
+        display = consoles.NarrativeConsole()
+        display.clear()
         y = 0
         while self.queue:
-            y = y + 1 + disp.con.print_box(1, y, NAR_WIDTH-1, NAR_HEIGHT, self.queue[0], [255, 255, 255], [0, 0, 0])
+            y = y + 1 + display.con.print_box(1, y, NAR_WIDTH-1, NAR_HEIGHT, self.queue[0], [255, 255, 255], [0, 0, 0])
             self.history.appendleft(self.queue.pop(0))
 
-        disp.blit()
+        display.blit()
 
 
 class SelectMenu:
@@ -48,7 +48,8 @@ class SelectMenu:
 
 
     def select(self, options):
-        disp = consoles.NarrativeConsole()
+        display = consoles.NarrativeConsole()
+        display.clear()
 
         kb = keyboard.MenuInput()
         index = 0
@@ -56,7 +57,7 @@ class SelectMenu:
         
         while selection == None:
             
-            disp.con.print(1, 0, 'Inventory')
+            display.con.print(1, 0, 'Inventory')
             y = 2
             for i, option in enumerate(options):
                 if i == index:
@@ -66,9 +67,9 @@ class SelectMenu:
                     fg = [255,255,255]
                     bg = [0,0,0]
                     
-                y = y + disp.con.print_box(1, y, NAR_WIDTH, 10, option.name, fg, bg)
+                y = y + display.con.print_box(1, y, NAR_WIDTH, 10, option.name, fg, bg)
 
-            disp.blit(True)
+            display.blit(True)
             
             fn, args, kwargs = kb.capture_keypress()
             if fn == 'move':
