@@ -190,7 +190,7 @@ class PlayerInput:
 
         kb = keyboard.GameInput()
         # Process player's input
-        fn, args, kwargs = kb.capture_keypress()
+        fn, args = kb.capture_keypress()
         if fn == 'move':
             try:
                 loc = self.parent.loc.proposed(args)
@@ -228,3 +228,12 @@ class PlayerInput:
             menu = ui.SelectMenu('Inventory')
             target = menu.select(self.parent.inventory.items)
             self.parent.inventory.drop(target)
+
+        elif fn == 'help':
+            print(HELP_TEXT)
+            help_ui = consoles.NarrativeConsole()
+            help_ui.clear()
+            help_ui.blit(True)
+            help_ui.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, HELP_TEXT, [255,255,255], [0,0,0])
+            help_ui.blit(True)
+            keyboard.CharInput().capture_keypress()

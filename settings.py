@@ -42,3 +42,13 @@ ELEMENTS = {
     'ground':           Obj('.', [60, 60, 60], [25, 25, 25], False, False),
     'wall':             Obj('#', [120, 120, 120], [25, 25, 25], True,  True),
 }
+
+HELP_TEXT = "\
+Roguelike development game is a work in progress. The basic mechanics are almost completed.\n\n\
+move: arrow keys & numpad\n\
+select: enter, numpad 5\n\
+u use\n\
+d drop\n\
+, pickup\n\
+. look\n\
+"

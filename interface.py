@@ -71,7 +71,7 @@ class SelectMenu:
 
             display.blit(True)
             
-            fn, args, kwargs = kb.capture_keypress()
+            fn, args = kb.capture_keypress()
             if fn == 'move':
                 index = self.move(index, args[0], len(options) - 1)
             elif fn == 'select':
