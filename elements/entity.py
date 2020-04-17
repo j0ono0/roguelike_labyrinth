@@ -7,6 +7,7 @@ from collections import namedtuple
 import field_of_view
 import interface as ui 
 from settings import ELEMENTS
+from environment import environment_manager as em
 
 
 ###################
@@ -43,18 +44,24 @@ class Inventory:
     def add(self, item):
         self.items.insert(0, item)
 
-    def pickup(self, target, lvl):
-        e = lvl.env.entities
+    def pickup(self, target):
+        e = em.entities
         i = e.index(target)
         self.add(e.pop(i))
         target.loc = self.parent.loc
         ui.narrative.add('{} picks up a {}.'.format(self.parent.kind, target.kind))
 
-    def drop(self, target, lvl):
-        i = self.items.index(target)
-        target.loc = Location(target.loc())
-        lvl.env.entities.append(self.items.pop(i))
-        ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
+    def drop(self, target):
+        try:
+            i = self.items.index(target)
+            target.loc = Location(target.loc())
+            em.entities.append(self.items.pop(i))
+            ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
+        except ValueError:
+            """
+            Action aborted.
+            Keypress does not match any inventory items.
+            """
 
 
 class Perception():

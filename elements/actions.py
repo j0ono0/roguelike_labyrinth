@@ -6,13 +6,14 @@ from . import entity
 import interface as ui
 import keyboard
 from pathfinding import dijkstra
+from environment import environment_manager as em
 
 
 class Interact:
     def __init__(self, parent):
         self.parent = parent
 
-    def __call__(self, target, lvl):
+    def __call__(self, target):
         ui.narrative.add("{} interacts with {}".format(self.parent.name, target.name))
         
 
@@ -20,7 +21,7 @@ class BlockTarget:
     def __init__(self, parent):
         self.parent = parent
 
-    def __call__(self, target, lvl):
+    def __call__(self, target):
         ui.narrative.add("The {} does not move, that way is blocked".format(target.name))
 
 
@@ -28,7 +29,7 @@ class MoveToLoc:
     def __init__(self, parent ,loc):
         self.loc = loc
     
-    def __call__(self, target, lvl):
+    def __call__(self, target):
         target.loc.update(self.loc)
 
 
@@ -38,27 +39,27 @@ class MoveToLevel:
         self.env_id = env_id
         self.return_entity = return_entity
 
-    def __call__(self, target, lvl):
-        lvl.save()
+    def __call__(self, target):
+        em.save()
         
         try:
-            lvl.load(self.env_id)
-            print(f'level {lvl.env.id} loaded')
+            em.load(self.env_id)
+            print(f'level {em.terrain.id} loaded')
         except FileNotFoundError:
             print('Level not found. Creating new level')
-            lvl.create(MAP_WIDTH, MAP_HEIGHT, self.parent.loc())
+            em.create(self.parent.loc())
             if self.return_entity:
                 self.return_entity.loc.update(self.parent.loc())
-                lvl.env.entities.append(self.return_entity)
-        
-        lvl.env.entities.append(target)
+                em.entities.append(self.return_entity)
+
+        em.entities.insert(0, target)
                 
 
 class DisplayEntity:
     def __init__(self, parent):
         self.parent = parent
 
-    def __call__(self, target, lvl):
+    def __call__(self, target):
         
         kb = keyboard.CharInput()
         
@@ -73,9 +74,9 @@ class DisplayEntity:
         
         emap = consoles.EnvironmentConsole()
 
-        entities = [e for e in lvl.env.entities if e.glyph == char]
+        entities = [e for e in em.entities if e.glyph == char]
         for e in entities:
-            path = lvl.find_path(target.loc(), e.loc())
+            path = em.find_path(target.loc(), e.loc())
             for loc in path[1:]:
                 emap.con.print(*loc, '.', [200,255,0])
             emap.con.print(*e.loc(), e.glyph, e.fg)
@@ -90,10 +91,10 @@ class FleeMap:
         self.parent = parent
 
     # Temporarly renders a contigueous section of map around parent.
-    def __call__(self, target, lvl):
+    def __call__(self, target):
         kb = keyboard.CharInput()
         emap = consoles.EnvironmentConsole()
-        graph = lvl.env.unblocked_tiles()
+        graph = em.terrain.unblocked_tiles()
         costmap = dijkstra(graph, {self.parent.loc(): 0})[1]
         # Reverse movement costs so entity flees starting points
         # Recalculate Dijkstra algorithm
@@ -127,8 +128,8 @@ class FleeTarget:
         self.parent = parent
 
     # Temporarly renders a contigueous section of map around parent.
-    def __call__(self, target, lvl):
-        graph = lvl.env.unblocked_tiles()
+    def __call__(self, target):
+        graph = em.terrain.unblocked_tiles()
         resistance_map = dijkstra(graph, {target.loc(): 0})[1]
         # Reverse movement costs so entity flees starting points
         # Recalculate Dijkstra algorithm
@@ -136,9 +137,9 @@ class FleeTarget:
         paths = dijkstra(graph, resistance_map)[0]
         
         loc = paths[self.parent.loc()]
-        target = lvl.get_target(loc, True)
+        target = em.get_target(loc, True)
         try:
-            target.action(self.parent, lvl)
+            target.action(self.parent)
         except AttributeError:
             ui.narrative.add('The {} needs less haste and more speed.'.format(target.kind))
         
@@ -151,15 +152,15 @@ class PersonalityA:
     def __init__(self, parent):
         self.parent = parent
 
-    def __call__(self, lvl):
+    def __call__(self):
         
         # TODO: stop from walking through blocking entities
 
         if len(self.path) > 0:
             loc = self.path.pop()
-            target = lvl.get_target(loc, True)
+            target = em.get_target(loc, True)
             try:
-                target.action(self.parent, target, lvl)
+                target.action(self.parent)
             except AttributeError:
                 ui.narrative.add('A {} blocks the {}\'s way.'.format(target.kind, self.parent.kind))
             
@@ -167,28 +168,21 @@ class PersonalityA:
             if self.parent.loc() != loc:
                 self.path.append(loc)
 
-    def flee(self, target, lvl):
-        ui.narrative.add('The {} menaces a {}'.format(self.parent.kind, target.kind))
-        ui.narrative.add('The {} flees!'.format(target.kind))
-        FleeTarget()(self.parent, target, lvl)
-        #self.path = lvl.find_path(target.loc(), lvl.env.random_empty_loc())
-
-
 class PlayerInput:
     def __init__(self, parent):
         self.parent = parent
 
-    def __call__(self, lvl):
+    def __call__(self):
 
         # update player field of view
-        self.parent.percept.see(lvl.env.fov_array())
-        lvl.update_seen(self.parent.percept.fov)
+        self.parent.percept.see(em.terrain.field_of_view())
+        em.terrain.mark_as_seen(self.parent.percept.fov)
         
         # Render game to screen
         console.clear()
         consoles.render_base()
         
-        lvl.blit(self.parent.percept.fov)
+        em.blit(self.parent.percept.fov)
         ui.narrative.blit()
         console.print(*(x + y for x, y in zip(MAP_OFFSET, self.parent.loc())), self.parent.glyph, self.parent.fg)
         
@@ -200,9 +194,9 @@ class PlayerInput:
         if fn == 'move':
             try:
                 loc = self.parent.loc.proposed(args)
-                target = lvl.get_target(loc, True)
+                target = em.get_target(loc, True)
                 try:
-                    target.action(self.parent, lvl)
+                    target.action(self.parent)
                 except AttributeError as e:
                     print(e)
                     ui.narrative.add('The {} blocks your way.'.format(target.name))
@@ -212,25 +206,25 @@ class PlayerInput:
 
         elif fn == 'use':
             menu = ui.SelectMenu('Inventory')
-            target = menu.select(self.parent.inventory.items) or lvl.get_target(self.parent.loc())
+            target = menu.select(self.parent.inventory.items) or em.get_target(self.parent.loc())
             
             # TODO enable player initiated use of items on ground
             
             try:
-                target.action(self.parent, lvl)
+                target.action(self.parent)
             except AttributeError as e:
                 ui.narrative.add('You see no way to use the {}.'.format(target.name))
 
         elif fn == 'pickup_select':
-            targets = [t for t in lvl.env.entities if t.loc() == self.parent.loc() and t != self.parent]
+            targets = [t for t in em.entities if t.loc() == self.parent.loc() and t != self.parent]
             if len(targets) > 1:
                 """ display select menu here """
             elif len(targets) == 1:
-                self.parent.inventory.pickup(targets.pop(), lvl)
+                self.parent.inventory.pickup(targets.pop())
             else:
                 ui.narrative.add('There is nothing here to pickup.')
 
         elif fn == 'drop_select':
             menu = ui.SelectMenu('Inventory')
             target = menu.select(self.parent.inventory.items)
-            self.parent.inventory.drop(target, lvl)
+            self.parent.inventory.drop(target)

@@ -2,7 +2,7 @@
 import random
 import tcod
 from elements import library as el
-from levels import level_handler as lvl
+from environment import environment_manager as em
 import keyboard
 import interface as ui
 from settings import *
@@ -10,21 +10,21 @@ from settings import *
 kb = keyboard.GameInput()
 
 # Delete existing saved levels
-lvl.delete_all()
+em.delete_all()
 
 # Create first environmentexit()
 print('Creating starting level')
-lvl.create(MAP_WIDTH, MAP_HEIGHT)
-
+em.create()
 # Setup player
-player = el.player_character('Deckard', lvl.env.random_unblocked_loc())
-lvl.env.entities.append(player)
+
+player = el.player_character('Deckard', em.random_unblocked_loc())
+em.entities.append(player)
 
 while True:
 
     # TODO: roll initiative
-    for e in lvl.env.entities:
+    for e in em.entities:
         try:
-            e.perform(lvl)
+            e.perform()
         except AttributeError:
             """ this entity has no personality """

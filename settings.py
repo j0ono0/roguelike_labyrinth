@@ -1,6 +1,9 @@
 from collections import namedtuple
 import tcod.event
 
+LEVEL_PREFIX = 'env_'
+
+
 SCREEN_WIDTH = 102
 SCREEN_HEIGHT = 43
 

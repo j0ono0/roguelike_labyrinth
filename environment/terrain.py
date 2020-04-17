@@ -2,6 +2,7 @@ import random
 import copy
 from collections import namedtuple
 from elements import library as el
+from settings import *
 
 Location = namedtuple('Location',['x', 'y'])
 
@@ -38,37 +39,37 @@ class Rect:
 
 
 class Terrain():
-    def __init__(self, width, height, id=0):
+    def __init__(self, id=0):
         self.id = id
-        self.width = width
-        self.height = height
+        self.width = MAP_WIDTH
+        self.height = MAP_HEIGHT
         self.tiles = None
-        self.entities = []
     
-    def fov_array(self):
+    def field_of_view(self):
         return {(x,y): self.tiles[x][y].block.sight == False for x in range(self.width) for y in range(self.height)}
 
     def unblocked_tiles(self):
         return [(x, y) for x in range(self.width) for y in range(self.height) if self.tiles[x][y].block.motion == False]
 
-    def random_empty_loc(self):
-        entity_locs = set([e.loc for  e in self.entities])
-        unblocked_locs = set([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].block.motion == False)])
-        return random.choice(list(unblocked_locs.difference(entity_locs)))
-
-    def random_unblocked_loc(self):
-        return random.choice([(x, y) for x in range(self.width) for y in range(self.height) if (self.tiles[x][y].block.motion == False)])
-
     def fill_tiles(self):
         self.tiles = LimitList([LimitList([el.wall() for y in range(self.height)]) for x in range(self.width)])
+    
+    def get_tile(self, loc):
+        x, y = loc
+        return self.tiles[x][y]
     
     def random_tile_loc(self):
         x = random.randrange(0, (self.width))
         y = random.randrange(0, (self.height))
         return Location(x, y)
+    
+    def mark_as_seen(self, locs):
+        for loc in locs:
+            x, y = loc
+            self.tiles[x][y].seen = True
 
 class BigRoom(Terrain):
-    def __init__(self, width, height, id=0):
+    def __init__(self, id=0):
         super().__init__(width, height, id)
 
     def build(self, entry_loc=None):
@@ -78,8 +79,8 @@ class BigRoom(Terrain):
 
 
 class BasicDungeon(Terrain):
-    def __init__(self, width, height, id=0):
-        super().__init__(width, height, id)
+    def __init__(self, id=0):
+        super().__init__(id)
         self.rooms = []
         self.min_size = 4
         self.max_size = 15
@@ -134,11 +135,9 @@ class BasicDungeon(Terrain):
                 pass
 
 
-
-
 class MazeMap(Terrain):
-    def __init__(self, width, height, id=0):
-        super().__init__(width, height, id)
+    def __init__(self, id=0):
+        super().__init__(id)
     
     def random_unblocked_loc(self):
         # Select from only even x/y tiles locations
