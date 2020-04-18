@@ -2,27 +2,27 @@
 import random
 import tcod
 from elements import library as el
-from environment import environment_manager as em
-import keyboard
-import interface as ui
+import dungeon_master as dm
+from user_interface import keyboard
+from user_interface import interfaces as ui
 # Setup keyboard input
 kb = keyboard.GameInput()
 
 # Delete existing saved levels
-em.delete_all()
+dm.delete_all()
 
 # Create first environmentexit()
 print('Creating starting level')
-em.create()
+dm.create()
 # Setup player
 
-player = el.player_character('Deckard', em.random_unblocked_loc())
-em.entities.append(player)
+player = el.player_character('Deckard', dm.random_unblocked_loc())
+dm.entities.append(player)
 
 while True:
 
     # TODO: roll initiative
-    for e in em.entities:
+    for e in dm.entities:
         try:
             e.perform()
         except AttributeError:

@@ -1,12 +1,12 @@
 import tcod
 from settings import *
-import consoles
-from consoles import root_console as console
+from user_interface import consoles
+from user_interface.consoles import root_console as console
 from . import entity
-import interface as ui
-import keyboard
+from user_interface import interfaces as ui
+from user_interface import keyboard
 from pathfinding import dijkstra
-from environment import environment_manager as em
+import dungeon_master as dm
 
 
 class Interact:
@@ -40,19 +40,19 @@ class MoveToLevel:
         self.return_entity = return_entity
 
     def __call__(self, target):
-        em.save()
+        dm.save()
         
         try:
-            em.load(self.env_id)
-            print(f'level {em.terrain.id} loaded')
+            dm.load(self.env_id)
+            print(f'level {dm.terrain.id} loaded')
         except FileNotFoundError:
             print('Level not found. Creating new level')
-            em.create(self.parent.loc())
+            dm.create(self.parent.loc())
             if self.return_entity:
                 self.return_entity.loc.update(self.parent.loc())
-                em.entities.append(self.return_entity)
+                dm.entities.append(self.return_entity)
 
-        em.entities.insert(0, target)
+        dm.entities.insert(0, target)
                 
 
 class DisplayEntity:
@@ -74,9 +74,9 @@ class DisplayEntity:
         
         emap = consoles.TerrainConsole()
 
-        entities = [e for e in em.entities if e.glyph == char]
+        entities = [e for e in dm.entities if e.glyph == char]
         for e in entities:
-            path = em.find_path(target.loc(), e.loc())
+            path = dm.find_path(target.loc(), e.loc())
             for loc in path[1:]:
                 emap.con.print(*loc, '.', [200,255,0])
             emap.con.print(*e.loc(), e.glyph, e.fg)
@@ -94,7 +94,7 @@ class FleeMap:
     def __call__(self, target):
         kb = keyboard.CharInput()
         emap = consoles.TerrainConsole()
-        graph = em.terrain.unblocked_tiles()
+        graph = dm.terrain.unblocked_tiles()
         costmap = dijkstra(graph, {self.parent.loc(): 0})[1]
         # Reverse movement costs so entity flees starting points
         # Recalculate Dijkstra algorithm
@@ -129,7 +129,7 @@ class FleeTarget:
 
     # Temporarly renders a contigueous section of map around parent.
     def __call__(self, target):
-        graph = em.terrain.unblocked_tiles()
+        graph = dm.terrain.unblocked_tiles()
         resistance_map = dijkstra(graph, {target.loc(): 0})[1]
         # Reverse movement costs so entity flees starting points
         # Recalculate Dijkstra algorithm
@@ -137,7 +137,7 @@ class FleeTarget:
         paths = dijkstra(graph, resistance_map)[0]
         
         loc = paths[self.parent.loc()]
-        target = em.get_target(loc, True)
+        target = dm.get_target(loc, True)
         try:
             target.action(self.parent)
         except AttributeError:
@@ -158,7 +158,7 @@ class PersonalityA:
 
         if len(self.path) > 0:
             loc = self.path.pop()
-            target = em.get_target(loc, True)
+            target = dm.get_target(loc, True)
             try:
                 target.action(self.parent)
             except AttributeError:
@@ -175,14 +175,14 @@ class PlayerInput:
     def __call__(self):
 
         # update player field of view
-        self.parent.percept.see(em.terrain.field_of_view())
-        em.terrain.mark_as_seen(self.parent.percept.fov)
+        self.parent.percept.see(dm.terrain.field_of_view())
+        dm.terrain.mark_as_seen(self.parent.percept.fov)
         
         # Render game to screen
         console.clear()
         consoles.render_base()
         
-        em.blit(self.parent.percept.fov)
+        dm.blit(self.parent.percept.fov)
         ui.narrative.blit()
         console.print(*(x + y for x, y in zip(MAP_OFFSET, self.parent.loc())), self.parent.glyph, self.parent.fg)
         

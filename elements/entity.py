@@ -5,9 +5,9 @@
 ###########################################################
 from collections import namedtuple
 import field_of_view
-import interface as ui 
+from user_interface import interfaces as ui 
 from settings import ELEMENTS
-from environment import environment_manager as em
+import dungeon_master as dm
 
 
 ###################
@@ -45,7 +45,7 @@ class Inventory:
         self.items.insert(0, item)
 
     def pickup(self, target):
-        e = em.entities
+        e = dm.entities
         i = e.index(target)
         self.add(e.pop(i))
         target.loc = self.parent.loc
@@ -55,7 +55,7 @@ class Inventory:
         try:
             i = self.items.index(target)
             target.loc = Location(target.loc())
-            em.entities.append(self.items.pop(i))
+            dm.entities.append(self.items.pop(i))
             ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
         except ValueError:
             """

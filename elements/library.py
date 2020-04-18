@@ -25,7 +25,7 @@ def wall():
 def stairs_up(env_id, loc=(-1,-1), return_entity=None):
     return  entity.Entity(
         'stairs up', 
-        'stairs_up', 
+        'stairs up', 
         entity.Location(loc), 
         {'action': (actions.MoveToLevel,[env_id, return_entity])}
     )
@@ -34,7 +34,7 @@ def stairs_up(env_id, loc=(-1,-1), return_entity=None):
 def stairs_down(env_id, loc=(-1,-1), return_entity=None):
     return entity.Entity(
                 'stairs down',
-                'stairs_down',
+                'stairs down',
                 entity.Location(loc),
                 {'action': (actions.MoveToLevel,[env_id, return_entity])}
             )
@@ -43,7 +43,7 @@ def stairs_down(env_id, loc=(-1,-1), return_entity=None):
 def locator(loc):
     return entity.Entity(
         'mysterious thing', 
-        'tech_device',
+        'tech device',
         loc if isinstance(loc, entity.Location) else entity.Location(loc), 
         {'action': (actions.DisplayEntity, [])}
     )
@@ -52,7 +52,7 @@ def locator(loc):
 def radar(loc):
     return entity.Entity(
         'Radar', 
-        'tech_device', 
+        'tech device', 
         loc if isinstance(loc, entity.Location) else entity.Location(loc), 
         {'action': (actions.FleeMap, [])}
     )
@@ -64,7 +64,7 @@ def player_character(name, loc):
     max_vision = max(MAP_WIDTH, MAP_HEIGHT)
     b = entity.Entity(
         name, 
-        'player_character', 
+        'player character', 
         entity.Location(loc), 
         {
             'action': (actions.BlockTarget,[]),

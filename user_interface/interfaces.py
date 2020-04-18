@@ -5,8 +5,8 @@ Dashboard interface components
 """
 from collections import deque
 import tcod
-import keyboard
-import consoles
+from user_interface import keyboard
+from user_interface import consoles
 from settings import *
 
 

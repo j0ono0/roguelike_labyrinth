@@ -1,7 +1,7 @@
 import os, pickle, re, random
 import tcod
-import consoles
-from . import terrain as terra
+from user_interface import consoles
+from elements import terrain as terra
 from pathfinding import astar
 from settings import *
 from elements import library as el
@@ -71,18 +71,12 @@ def save():
     with open(filepath, 'wb') as f:
         pickle.dump(game, f)
     print(f'game level {terrain.id} saved')
-    
-
-def exits():
-    return [e for e in entities if e.glyph in ['<','>']]
-
 
 def get_target(loc, block_motion=False):
     # Return first item (or tile) at location
     if block_motion == True:
         return next(iter([e for e in entities if e.loc() == loc and e.block.motion == True]), terrain.get_tile(loc))
     return next(iter([e for e in entities if e.loc() == loc]), terrain.get_tile(loc))
-
     
 def find_path(start, end):
     return astar(terrain.field_of_view(), start, end)

@@ -34,11 +34,11 @@ ACTION_KEYS = {
 
 Obj = namedtuple('Obj', ['glyph','fg', 'bg', 'block_motion', 'block_sight'])
 ELEMENTS = {
-    'player_character': Obj('@', [255, 255, 255], [0, 0, 0],  True, False),
+    'player character': Obj('@', [255, 255, 255], [0, 0, 0],  True, False),
     'human':            Obj('@', [200, 160, 120], [0, 0, 0],  True, False),
-    'stairs_down':      Obj('>', [255, 255, 255], [0, 0, 0], False, False),
-    'stairs_up':        Obj('<', [255, 255, 255], [0, 0, 0], False, False),
-    'tech_device':      Obj('+', [120, 150, 110], [0, 0, 0], False, False),
+    'stairs down':      Obj('>', [255, 255, 255], [0, 0, 0], False, False),
+    'stairs up':        Obj('<', [255, 255, 255], [0, 0, 0], False, False),
+    'tech device':      Obj('+', [120, 150, 110], [0, 0, 0], False, False),
     'ground':           Obj('.', [60, 60, 60], [25, 25, 25], False, False),
     'wall':             Obj('#', [120, 120, 120], [25, 25, 25], True,  True),
 }
