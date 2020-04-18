@@ -8,7 +8,7 @@ def ground(loc):
     return entity.Tile(
         'ground', 
         'ground', 
-        {'action': (actions.MoveToLoc,[loc])}
+        {'action': (actions.MoveTarget,[loc])}
     )
     
 

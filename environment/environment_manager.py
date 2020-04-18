@@ -79,7 +79,9 @@ def exits():
 
 def get_target(loc, block_motion=False):
     # Return first item (or tile) at location
-    return next(iter([e for e in entities if e.loc() == loc and e.block.motion == block_motion]), terrain.get_tile(loc))
+    if block_motion == True:
+        return next(iter([e for e in entities if e.loc() == loc and e.block.motion == True]), terrain.get_tile(loc))
+    return next(iter([e for e in entities if e.loc() == loc]), terrain.get_tile(loc))
 
     
 def find_path(start, end):
@@ -97,15 +99,14 @@ def random_unblocked_loc():
 
 
 def blit(fov):
-    disp = consoles.EnvironmentConsole()
+    display = consoles.TerrainConsole()
 
-    con = tcod.console.Console(MAP_WIDTH, MAP_HEIGHT, order="F")
     # Add terrain tiles to console
     for x in range(MAP_WIDTH): 
         for y in range(MAP_HEIGHT):
             t = terrain.tiles[x][y]
             if (x,y) in fov:
-                disp.con.tiles[(x,y)] = (
+                display.con.tiles[(x,y)] = (
                     ord(t.glyph),
                     t.fg + [255],
                     t.bg + [255]
@@ -114,7 +115,7 @@ def blit(fov):
                 # Reduce color by 50% for unseen tiles
                 fg = [c*.5 for c in t.fg]
                 bg = [c*.5 for c in t.bg]
-                disp.con.tiles[(x,y)] = (
+                display.con.tiles[(x,y)] = (
                     ord(t.glyph),
                     fg + [255],
                     bg + [255]
@@ -123,6 +124,6 @@ def blit(fov):
     # Add entities to console
     for e in entities:
         if e.loc() in fov:
-            disp.con.print(*e.loc(), e.glyph, e.fg)
+            display.con.print(*e.loc(), e.glyph, e.fg)
 
-    disp.blit()
+    display.blit()

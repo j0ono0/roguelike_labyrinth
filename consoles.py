@@ -21,12 +21,23 @@ class NarrativeConsole:
             tcod.console_flush()
 
 
-class EnvironmentConsole:
+class TerrainConsole:
     def __init__(self):
         self.con = tcod.console.Console(MAP_WIDTH, MAP_HEIGHT, order="F")
 
     def blit(self, flush=False):
         self.con.blit(root_console, *MAP_OFFSET, 0, 0, MAP_WIDTH, MAP_HEIGHT, 1, 1, 0)
+        if flush:
+            tcod.console_flush()
+
+
+class EntityConsole:
+    def __init__(self):
+        self.con = tcod.console.Console(1, 1, order="F")
+
+    def blit(self, offset, flush=False):
+        x, y = [a+b for a, b in zip(offset, MAP_OFFSET)]
+        self.con.blit(root_console, x, y, 0, 0, 1, 1, 1, 1, 0)
         if flush:
             tcod.console_flush()
 

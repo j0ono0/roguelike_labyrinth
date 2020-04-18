@@ -25,7 +25,7 @@ class BlockTarget:
         ui.narrative.add("The {} does not move, that way is blocked".format(target.name))
 
 
-class MoveToLoc:
+class MoveTarget:
     def __init__(self, parent ,loc):
         self.loc = loc
     
@@ -72,7 +72,7 @@ class DisplayEntity:
         narr.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, "You sense the device searching.")
         narr.blit()
         
-        emap = consoles.EnvironmentConsole()
+        emap = consoles.TerrainConsole()
 
         entities = [e for e in em.entities if e.glyph == char]
         for e in entities:
@@ -93,7 +93,7 @@ class FleeMap:
     # Temporarly renders a contigueous section of map around parent.
     def __call__(self, target):
         kb = keyboard.CharInput()
-        emap = consoles.EnvironmentConsole()
+        emap = consoles.TerrainConsole()
         graph = em.terrain.unblocked_tiles()
         costmap = dijkstra(graph, {self.parent.loc(): 0})[1]
         # Reverse movement costs so entity flees starting points
@@ -188,52 +188,10 @@ class PlayerInput:
         
         tcod.console_flush()
 
-        kb = keyboard.GameInput()
         # Process player's input
-        fn, args = kb.capture_keypress()
-        if fn == 'move':
-            try:
-                loc = self.parent.loc.proposed(args)
-                target = em.get_target(loc, True)
-                try:
-                    target.action(self.parent)
-                except AttributeError as e:
-                    print(e)
-                    ui.narrative.add('The {} blocks your way.'.format(target.name))
-            except IndexError as e:
-                # Player reached edge of environment
-                ui.narrative.add('There is no way through here!')
-
-        elif fn == 'use':
-            menu = ui.SelectMenu('Inventory')
-            target = menu.select(self.parent.inventory.items) or em.get_target(self.parent.loc())
-            
-            # TODO enable player initiated use of items on ground
-            
-            try:
-                target.action(self.parent)
-            except AttributeError as e:
-                ui.narrative.add('You see no way to use the {}.'.format(target.name))
-
-        elif fn == 'pickup_select':
-            targets = [t for t in em.entities if t.loc() == self.parent.loc() and t != self.parent]
-            if len(targets) > 1:
-                """ display select menu here """
-            elif len(targets) == 1:
-                self.parent.inventory.pickup(targets.pop())
-            else:
-                ui.narrative.add('There is nothing here to pickup.')
-
-        elif fn == 'drop_select':
-            menu = ui.SelectMenu('Inventory')
-            target = menu.select(self.parent.inventory.items)
-            self.parent.inventory.drop(target)
-
-        elif fn == 'help':
-            print(HELP_TEXT)
-            help_ui = consoles.NarrativeConsole()
-            help_ui.clear()
-            help_ui.blit(True)
-            help_ui.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, HELP_TEXT, [255,255,255], [0,0,0])
-            help_ui.blit(True)
-            keyboard.CharInput().capture_keypress()
+        fn, args = keyboard.GameInput().capture_keypress()
+        try:
+            fn(self.parent, args)
+        except TypeError as e:
+            print('The keyboard cmd does not have a function:', e)
+        
