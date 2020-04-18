@@ -29,7 +29,7 @@ class Narrative:
         display.clear()
         y = 0
         while self.queue:
-            y = y + 1 + display.con.print_box(1, y, NAR_WIDTH-1, NAR_HEIGHT, self.queue[0], [255, 255, 255], [0, 0, 0])
+            y = y + 1 + display.con.print_box(1, y, NAR_WIDTH, NAR_HEIGHT, self.queue[0], [255, 255, 255], [0, 0, 0])
             self.history.appendleft(self.queue.pop(0))
 
         display.blit()

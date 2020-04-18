@@ -21,7 +21,7 @@ def move(parent, args):
 
 def use(parent, args):
     menu = ui.SelectMenu('Inventory')
-    target = menu.select(parent.inventory.items) or em.get_target(self.parent.loc())
+    target = menu.select(parent.inventory.items) or em.get_target(parent.loc())
     
     # TODO enable player initiated use of items on ground
     
@@ -58,21 +58,32 @@ def help(parent, args):
 def target_select(parent, args):
     kb = keyboard.TargetInput()
     loc = parent.loc()
-    display = consoles.EntityConsole()
     seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if em.terrain.tiles[x][y].seen == True]
+    
+    narrative = consoles.NarrativeConsole()
+    display = consoles.EntityConsole()
+    
     while True:
+        narrative.clear()
         if loc in seen_tiles:
             target = em.get_target(loc)
             glyph = target.glyph
             fg = [0,0,0]
             bg = [255,255,255]
+            narrative.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, target.kind, [255, 255, 255], [0, 0, 0])
         else:
             glyph = ' '
             fg = [0,0,0]
             bg = [120,120,120]
+            
         display.con.print(0, 0, glyph, fg, bg)
+        
+        # Update screen
         em.blit(parent.percept.fov)
+        narrative.blit()
         display.blit(loc, True)
+        
+        # Wait for keypress
         fn, args = kb.capture_keypress()
         if fn == 'target':
             loc = tuple([a+b for (a, b) in zip(loc, args)])
