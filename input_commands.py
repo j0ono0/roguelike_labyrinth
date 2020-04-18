@@ -26,8 +26,22 @@ def move(parent, args):
 
 
 def use(parent, args):
-    menu = ui.SelectMenu('Inventory')
-    target = menu.select(parent.inventory.items) or dm.get_target(parent.loc())
+    menu = ui.SelectMenu('Use from inventory:')
+    target = menu.select(parent.inventory.items)
+    
+    # TODO enable player initiated use of items on ground
+    
+    try:
+        target.action(parent)
+    except AttributeError as e:
+        ui.narrative.add('You see no way to use the {}.'.format(target.name))
+        print(e)
+
+
+def use_from_ground(parent, args):
+    menu = ui.SelectMenu('Use from nearby:')
+    items = [e for e in dm.entities if e.loc() == parent.loc() and e is not parent]
+    target = menu.select(items)
     
     # TODO enable player initiated use of items on ground
     

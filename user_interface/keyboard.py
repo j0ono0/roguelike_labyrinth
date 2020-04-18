@@ -38,11 +38,16 @@ class InputHandler:
             
             # Return content from keymap
                 if event.type == 'KEYDOWN':
-                    try:
-                        return self.keymap[event.sym]
-                    except KeyError as e:
-                        print('key not registered.', e)
-                        return (None, None)
+                    if event.mod & tcod.event.KMOD_SHIFT:
+                        try:
+                            return self.caps_keymap[event.sym]
+                        except KeyError:
+                            """ keydown event was shift key """
+                    else:
+                        try:
+                            return self.keymap[event.sym]
+                        except KeyError:
+                            """ key is not registed to a function """
 
                 elif event.type == 'QUIT':
                     # Halt the script using SystemExit
@@ -100,6 +105,9 @@ class GameInput(InputHandler):
             tcod.event.K_t: (cmd.target_select,[]),
             tcod.event.K_u: (cmd.use,[]),
             tcod.event.K_w: ('wield',[]),
+        }
+        self.caps_keymap = {
+            tcod.event.K_u: (cmd.use_from_ground,[]),
         }
 
 

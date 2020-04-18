@@ -61,16 +61,16 @@ def load(id):
     entities = data['entities']
 
 def save():
-    # remove Player character(s) before saving
+    # remove player character(s) before saving
     game = {
         'environment': terrain,
-        'entities': [e for e in entities if e.kind != 'player_character']
+        'entities': [e for e in entities if e.kind != 'player character']
     }
 
     filepath = os.path.join('gamedata', f'{LEVEL_PREFIX}{terrain.id}.pickle')
     with open(filepath, 'wb') as f:
         pickle.dump(game, f)
-    print(f'game level {terrain.id} saved')
+    print(f'game environment {terrain.id} saved')
 
 def get_target(loc, block_motion=False):
     # Return first item (or tile) at location

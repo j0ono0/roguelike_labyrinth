@@ -47,7 +47,8 @@ HELP_TEXT = "\
 Roguelike development game is a work in progress. The basic mechanics are almost completed.\n\n\
 move: arrow keys & numpad\n\
 select: enter, numpad 5\n\
-u use\n\
+u use from pack\n\
+U use from ground\n\
 d drop\n\
 , pickup\n\
 . look\n\
