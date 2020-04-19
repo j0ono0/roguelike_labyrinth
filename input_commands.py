@@ -90,11 +90,11 @@ def target_select(parent, args):
                 entities = [e for e in dm.entities if e.loc() == loc]
                 glyph = entities[0].glyph
                 if len(entities) > 7:
-                    txt = 'A {} and many other items.'.format(entities[0].kind)
+                    txt = '{} and many other items.'.format(entities[0])
                 elif len(entities) > 1:
-                    txt = 'A {} and a few other items.'.format(entities[0].kind)
+                    txt = '{} and a few other items.'.format(entities[0])
                 else:
-                    txt = '{}.'.format(entities[0].kind)
+                    txt = '{}.'.format(entities[0])
             except IndexError:
                 """ No entities are at this location """
                 x, y = loc

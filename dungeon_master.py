@@ -47,7 +47,7 @@ def create(entry_loc=None):
     stairs_down = el.stairs_down(tid+1, random_empty_loc(), stairs_up)
     # Populate environment with some items
     locator = el.locator(random_empty_loc())
-    person = el.human('Jaffles', random_empty_loc())
+    person = el.human(random_empty_loc())
 
     entities = ([stairs_down, locator, person])
 

@@ -32,15 +32,18 @@ ACTION_KEYS = {
     tcod.event.K_SPACE: True
 }
 
-Obj = namedtuple('Obj', ['glyph','fg', 'bg', 'block_motion', 'block_sight'])
+Obj = namedtuple('Obj', ['glyph','fg', 'bg', 'block'])
+Block = namedtuple('Block', ['motion', 'sight'])
+
 ELEMENTS = {
-    'player character': Obj('@', [255, 255, 255], [0, 0, 0],  True, False),
-    'human':            Obj('@', [200, 160, 120], [0, 0, 0],  True, False),
-    'stairs down':      Obj('>', [255, 255, 255], [0, 0, 0], False, False),
-    'stairs up':        Obj('<', [255, 255, 255], [0, 0, 0], False, False),
-    'tech device':      Obj('+', [120, 150, 110], [0, 0, 0], False, False),
-    'ground':           Obj('.', [60, 60, 60], [25, 25, 25], False, False),
-    'wall':             Obj('#', [120, 120, 120], [25, 25, 25], True,  True),
+    'player character': Obj('@', [255, 255, 255], [0, 0, 0], Block(True, False)),
+    'human':            Obj('@', [200, 160, 120], [0, 0, 0], Block(True, False)),
+    'stairs down':      Obj('>', [255, 255, 255], [0, 0, 0], Block(False, False)),
+    'stairs up':        Obj('<', [255, 255, 255], [0, 0, 0], Block(False, False)),
+    'tech device':      Obj('+', [120, 150, 110], [0, 0, 0], Block(False, False)),
+    'ground':           Obj('.', [60, 60, 60], [25, 25, 25], Block(False, False)),
+    'wall':             Obj('#', [120, 120, 120], [25, 25, 25], Block(True, True)),
+    'corpse':           Obj('%', [200, 120, 120], [0, 0, 0], Block(False, False)),
 }
 
 HELP_TEXT = "\

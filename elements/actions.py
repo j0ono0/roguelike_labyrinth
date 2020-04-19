@@ -1,3 +1,4 @@
+import random
 import tcod
 from settings import *
 from user_interface import consoles
@@ -6,6 +7,7 @@ from . import entity
 from user_interface import interfaces as ui
 from user_interface import keyboard
 from pathfinding import dijkstra
+import field_of_view
 import dungeon_master as dm
 
 
@@ -123,27 +125,15 @@ class FleeMap:
         kb.capture_keypress()
 
 
-class FleeTarget:
+class Defend:
     def __init__(self, parent):
         self.parent = parent
 
     # Temporarly renders a contigueous section of map around parent.
     def __call__(self, target):
-        graph = dm.terrain.unblocked_tiles()
-        resistance_map = dijkstra(graph, {target.loc(): 0})[1]
-        # Reverse movement costs so entity flees starting points
-        # Recalculate Dijkstra algorithm
-        resistance_map = {key:value * -1.175 for (key, value) in resistance_map.items()}
-        paths = dijkstra(graph, resistance_map)[0]
+        """ DEFEND """
+        self.parent.life.damage(1)
         
-        loc = paths[self.parent.loc()]
-        target = dm.get_target(loc, True)
-        try:
-            target.action(self.parent)
-        except AttributeError:
-            ui.narrative.add('The {} needs less haste and more speed.'.format(target.kind))
-        
-
     
 
 ################################################
@@ -153,20 +143,25 @@ class PersonalityA:
         self.parent = parent
 
     def __call__(self):
-        
-        # TODO: stop from walking through blocking entities
+        if self.parent.life.current < 2: 
+            fov = field_of_view.scan(self.parent.loc(), dm.terrain.field_of_view(), 3)
+            flee_source = {e.loc(): 0 for e in dm.entities if e.loc() in fov if e.kind == 'player character'}
+            if len(flee_source) > 0:
+                """ FLEE """
+                graph = dm.terrain.unblocked_tiles()
+                resistance_map = dijkstra(graph, flee_source)[1]
+                # Reverse movement costs so entity flees starting points
+                # Recalculate Dijkstra algorithm
+                resistance_map = {key:value * -1.175 for (key, value) in resistance_map.items()}
+                paths = dijkstra(graph, resistance_map)[0]
+                
+                loc = paths[self.parent.loc()]
+                target = dm.get_target(loc, True)
+                try:
+                    target.action(self.parent)
+                except AttributeError:
+                    ui.narrative.add('The {} needs less haste and more speed.'.format(target))
 
-        if len(self.path) > 0:
-            loc = self.path.pop()
-            target = dm.get_target(loc, True)
-            try:
-                target.action(self.parent)
-            except AttributeError:
-                ui.narrative.add('A {} blocks the {}\'s way.'.format(target.kind, self.parent.kind))
-            
-            # replace loc if entity was unable to move
-            if self.parent.loc() != loc:
-                self.path.append(loc)
 
 class PlayerInput:
     def __init__(self, parent):

@@ -1,3 +1,4 @@
+import random
 from . import entity
 from . import actions
 from settings import *
@@ -7,14 +8,12 @@ from settings import *
 def ground(loc):
     return entity.Tile(
         'ground', 
-        'ground', 
         {'action': (actions.MoveTarget,[loc])}
     )
     
 
 def wall():
     return entity.Tile(
-        'wall', 
         'wall',
         {'action': (actions.BlockTarget, [])}
     )
@@ -25,7 +24,7 @@ def wall():
 def stairs_up(env_id, loc=(-1,-1), return_entity=None):
     return  entity.Entity(
         'stairs up', 
-        'stairs up', 
+        None, 
         entity.Location(loc), 
         {'action': (actions.MoveToLevel,[env_id, return_entity])}
     )
@@ -33,17 +32,17 @@ def stairs_up(env_id, loc=(-1,-1), return_entity=None):
 
 def stairs_down(env_id, loc=(-1,-1), return_entity=None):
     return entity.Entity(
-                'stairs down',
-                'stairs down',
-                entity.Location(loc),
-                {'action': (actions.MoveToLevel,[env_id, return_entity])}
-            )
+        'stairs down',
+        None,
+        entity.Location(loc),
+        {'action': (actions.MoveToLevel,[env_id, return_entity])}
+    )
 
 
 def locator(loc):
     return entity.Entity(
-        'mysterious thing', 
         'tech device',
+        'locator', 
         loc if isinstance(loc, entity.Location) else entity.Location(loc), 
         {'action': (actions.DisplayEntity, [])}
     )
@@ -51,8 +50,8 @@ def locator(loc):
 
 def radar(loc):
     return entity.Entity(
-        'Radar', 
         'tech device', 
+        'radar', 
         loc if isinstance(loc, entity.Location) else entity.Location(loc), 
         {'action': (actions.FleeMap, [])}
     )
@@ -63,30 +62,32 @@ def radar(loc):
 def player_character(name, loc):
     max_vision = max(MAP_WIDTH, MAP_HEIGHT)
     b = entity.Entity(
-        name, 
         'player character', 
+        name, 
         entity.Location(loc), 
         {
-            'action': (actions.BlockTarget,[]),
+            'life': (entity.Life, [4]),
             'percept': (entity.Perception, [max_vision]),
             'inventory': (entity.Inventory, [10]),
-            'perform': (actions.PlayerInput, [])
+            'perform': (actions.PlayerInput, []),
+            'action': (actions.BlockTarget,[]),
         }
     )
     # Equip with initial starting items
     b.inventory.items.extend([locator(b.loc), radar(b.loc)])
     return b
 
-def human(name, loc):
+def human(loc):
     max_vision = max(MAP_WIDTH, MAP_HEIGHT)
     return entity.Entity(
-        name, 
-        'human', 
+        'human',
+        None,
         entity.Location(loc),
         {
+            'life': (entity.Life, [random.randint(1,3)]),
             'percept': (entity.Perception, [max_vision]),
             'inventory': (entity.Inventory, [10]),
             'perform': (actions.PersonalityA,[]),
-            'action': (actions.FleeTarget, [])
+            'action': (actions.Defend, []),
         }        
     ) 

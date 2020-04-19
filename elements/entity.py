@@ -6,7 +6,7 @@
 from collections import namedtuple
 import field_of_view
 from user_interface import interfaces as ui 
-from settings import ELEMENTS
+from settings import ELEMENTS, Obj
 import dungeon_master as dm
 
 
@@ -64,7 +64,7 @@ class Inventory:
             """
 
 
-class Perception():
+class Perception:
     def __init__(self, parent, max_vision):
         self.max_vision = max_vision
         self.loc = parent.loc
@@ -74,7 +74,38 @@ class Perception():
         self.fov = field_of_view.scan(self.loc(), terrain, self.max_vision)
 
 
-    
+class Life:
+    def __init__(self, parent, max):
+        self.parent = parent
+        self.max = max
+        self.current = max
+
+    def damage(self, num):
+        self.current = self.current - num
+        if self.current >= 0:
+            self.die()
+
+    def die(self):
+        ui.narrative.add('{} dies'.format(self.parent))
+        
+        for attr in Obj._fields:
+            setattr(self.parent, attr, getattr(ELEMENTS['corpse'], attr))
+        
+        self.parent.del_ability('perform')
+       
+        
+
+class Combat:
+    def __init__(self, parent, offence, defence):
+        self.offence = offence
+        self.defence = defence
+
+    def attack(self, target):
+        pass
+
+    def damage(self, amount):
+        self.life = self.life - amount
+
 
 
 
@@ -84,42 +115,46 @@ class Perception():
 #
 ###################
 
-Block = namedtuple('Block', ['motion', 'sight'])
-
 class Entity():
-    def __init__(self, name, kind, loc=Location(), abilities={}):
-        self.name = name
+    def __init__(self, kind, name=None, loc=Location(), abilities={}):
         self.kind = kind
+        self.name = name
         self.loc = loc
         self.glyph = ELEMENTS[kind].glyph
         self.fg = ELEMENTS[kind].fg
         self.bg = ELEMENTS[kind].bg
-        self.block = Block(ELEMENTS[kind].block_motion, ELEMENTS[kind].block_sight)
+        self.block = ELEMENTS[kind].block
         # Create properties for all kwargs
         for name, ability in abilities.items():
             self.add_ability(name, ability)
         
     def __str__(self):
-        return self.name
+        return f"{self.name} the {self.kind}" if self.name else f"A {self.kind}" 
+
 
     def add_ability(self, name, ability):
         fn, args = ability
         setattr(self, name, fn(self, *args))
 
+    def del_ability(self, name):
+        delattr(self, name)
+
 class Tile:
-    def __init__(self, name, kind, abilities):
-        self.name = name
+    def __init__(self, kind, abilities):
         self.kind = kind
         self.glyph = ELEMENTS[kind].glyph
         self.fg = ELEMENTS[kind].fg
         self.bg = ELEMENTS[kind].bg
-        self.block = Block(ELEMENTS[kind].block_motion, ELEMENTS[kind].block_sight)
+        self.block = ELEMENTS[kind].block
         self.seen = False
         
         # Create properties for all kwargs
         for name, ability in abilities.items():
             self.add_ability(name, ability)
         
+    def __str__(self):
+        return self.kind
+
     def add_ability(self, name, ability):
         fn, args = ability
         setattr(self, name, fn(self, *args))
