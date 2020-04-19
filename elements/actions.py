@@ -169,24 +169,18 @@ class PlayerInput:
 
     def __call__(self):
 
-        # update player field of view
-        self.parent.percept.see(dm.terrain.field_of_view())
-        dm.terrain.mark_as_seen(self.parent.percept.fov)
-        
-        # Render game to screen
-        console.clear()
-        consoles.render_base()
-        
-        dm.blit(self.parent.percept.fov)
-        ui.narrative.blit()
-        console.print(*(x + y for x, y in zip(MAP_OFFSET, self.parent.loc())), self.parent.glyph, self.parent.fg)
-        
-        tcod.console_flush()
-
         # Process player's input
         fn, args = keyboard.GameInput().capture_keypress()
+
+        # Clear messages in narrative display
+        ui.narrative.archive()
+
         try:
             fn(self.parent, args)
         except TypeError as e:
             print('The keyboard cmd does not have a function:', e)
+
+        # update player field of view
+        self.parent.percept.see(dm.terrain.field_of_view())
+        dm.terrain.mark_as_seen(self.parent.percept.fov)
         

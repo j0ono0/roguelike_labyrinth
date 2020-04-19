@@ -15,8 +15,13 @@ MAP_OFFSET = (3,2)
 
 # narrative window
 NAR_WIDTH = 40
-NAR_HEIGHT = 39
+NAR_HEIGHT = 29
 NAR_OFFSET = (58,2)
+
+# Player's character details
+PC_WIDTH  = 40
+PC_HEIGHT = 8
+PC_OFFSET = (58, 33)
 
 # Create a dictionary that maps keys to vectors.
 # Names of the available keys can be found in the online documentation:

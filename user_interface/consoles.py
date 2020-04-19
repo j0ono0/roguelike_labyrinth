@@ -42,6 +42,16 @@ class EntityConsole:
             tcod.console_flush()
 
 
+class CharacterConsole:
+    def __init__(self):
+        self.con = tcod.console.Console(PC_WIDTH, PC_HEIGHT, order="F")
+        
+    def blit(self, flush=False):
+        self.con.blit(root_console, *PC_OFFSET, 0, 0, PC_WIDTH, PC_HEIGHT, 1, 1, 0)
+        if flush:
+            tcod.console_flush()
+
+
 # Setup the font.
 tcod.console_set_custom_font(
     "terminal8x12_gs_tc.png",
@@ -59,3 +69,4 @@ root_console.default_bg_blend = 0
 def render_base():
     root_console.draw_frame(MAP_OFFSET[0] - 1, MAP_OFFSET[1] - 1, MAP_WIDTH + 2, MAP_HEIGHT + 2)
     root_console.draw_frame(NAR_OFFSET[0] - 1, NAR_OFFSET[1] - 1, NAR_WIDTH + 3, NAR_HEIGHT + 2)
+    root_console.draw_frame(PC_OFFSET[0] - 1,  PC_OFFSET[1] - 1,  PC_WIDTH + 3,  PC_HEIGHT + 2)

@@ -1,6 +1,7 @@
 import os, pickle, re, random
 import tcod
 from user_interface import consoles
+from user_interface import interfaces as ui
 from elements import terrain as terra
 from pathfinding import astar
 from settings import *
@@ -121,3 +122,16 @@ def blit(fov):
             display.con.print(*e.loc(), e.glyph, e.fg)
 
     display.blit()
+
+def render_game(fov):
+        # Render updated interfaces to screen
+        consoles.root_console.clear()
+        consoles.render_base()
+        
+        ui.narrative.blit()
+        ui.player_display.blit()
+        blit(fov)
+        
+        #console.print(*(x + y for x, y in zip(MAP_OFFSET, self.parent.loc())), self.parent.glyph, self.parent.fg)
+        
+        tcod.console_flush()

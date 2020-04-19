@@ -24,14 +24,21 @@ class Narrative:
     def add(self, msg):
         self.queue.append(msg)
 
+    def archive(self):
+        while self.queue:
+            self.history.appendleft(self.queue.pop(0))
+
     def blit(self):
         display = consoles.NarrativeConsole()
         display.clear()
         y = 0
+        """
         while self.queue:
             y = y + 1 + display.con.print_box(1, y, NAR_WIDTH, NAR_HEIGHT, self.queue[0], [255, 255, 255], [0, 0, 0])
             self.history.appendleft(self.queue.pop(0))
-
+        """
+        for msg in self.queue:
+            y = y + 1 + display.con.print_box(1, y, NAR_WIDTH, NAR_HEIGHT, msg, [255, 255, 255], [0, 0, 0])
         display.blit()
 
 
@@ -67,7 +74,7 @@ class SelectMenu:
                     fg = [255,255,255]
                     bg = [0,0,0]
                     
-                y = y + display.con.print_box(1, y, NAR_WIDTH, 10, option.name, fg, bg)
+                y = y + display.con.print_box(1, y, NAR_WIDTH, 10, option.kind, fg, bg)
 
             display.blit(True)
             
@@ -81,6 +88,20 @@ class SelectMenu:
             
         return selection
 
+
+class PlayerCharacter:
+    def __init__(self, character=None):
+        self.c = character
+
+    def blit(self):
+        fg = [160,160,160]
+        bg = [0,0,0]
+        display = consoles.CharacterConsole()
+        display.con.print(0,0, self.c.name, [0,0,0], [160,160,160])
+        display.con.print(0,1, f"{self.c.life.current}/{self.c.life.max}", fg, bg)
+        display.blit()
+
 #################
 
 narrative = Narrative()
+player_display = PlayerCharacter() # Assign character from main.py
