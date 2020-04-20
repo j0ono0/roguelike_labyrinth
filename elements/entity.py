@@ -66,23 +66,27 @@ class Inventory:
 
 class Perception:
     def __init__(self, parent, max_vision):
+        self.parent = parent
         self.max_vision = max_vision
-        self.loc = parent.loc
         self.fov = []
  
     def see(self, terrain):
-        self.fov = field_of_view.scan(self.loc(), terrain, self.max_vision)
+        self.fov = field_of_view.scan(self.parent.loc(), terrain, self.max_vision)
 
 
 class Life:
-    def __init__(self, parent, max):
+    def __init__(self, parent, max, personality=None):
         self.parent = parent
         self.max = max
         self.current = max
+        self.personality = personality
+
+    def __call__(self):
+        return self.current > 0
 
     def damage(self, num):
         self.current = self.current - num
-        if self.current >= 0:
+        if self.current <= 0:
             self.die()
 
     def die(self):
@@ -129,7 +133,7 @@ class Entity():
             self.add_ability(name, ability)
         
     def __str__(self):
-        return f"{self.name} the {self.kind}" if self.name else f"A {self.kind}" 
+        return f"{self.name}" if self.name else f"A {self.kind}" 
 
 
     def add_ability(self, name, ability):

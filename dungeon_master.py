@@ -80,7 +80,7 @@ def get_target(loc, block_motion=False):
     return next(iter([e for e in entities if e.loc() == loc]), terrain.get_tile(loc))
     
 def find_path(start, end):
-    return astar(terrain.field_of_view(), start, end)
+    return astar(terrain.sightmap, start, end)
 
 
 def random_empty_loc():

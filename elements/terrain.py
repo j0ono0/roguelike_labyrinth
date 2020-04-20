@@ -43,17 +43,22 @@ class Terrain():
         self.id = id
         self.width = MAP_WIDTH
         self.height = MAP_HEIGHT
-        self.tiles = None
+        self.tiles = LimitList([LimitList([el.wall() for y in range(self.height)]) for x in range(self.width)])
+        # Save 2d array of tiles that allow sight for easy & fast reference
+        self.sightmap = None
+        self.motionmap = None
     
-    def field_of_view(self):
-        return {(x,y): self.tiles[x][y].block.sight == False for x in range(self.width) for y in range(self.height)}
+    def create_sightmap(self):
+        # Create new sightmap if it does not exist.
+        self.sightmap = [[self.tiles[x][y].block.sight == False for y in range(MAP_HEIGHT)] for x in range(MAP_WIDTH)]
+
+    def create_motionmap(self):
+        # Create new sightmap if it does not exist.
+        self.motionmap = [[self.tiles[x][y].block.motion == False for y in range(MAP_HEIGHT)] for x in range(MAP_WIDTH)]
 
     def unblocked_tiles(self):
         return [(x, y) for x in range(self.width) for y in range(self.height) if self.tiles[x][y].block.motion == False]
 
-    def fill_tiles(self):
-        self.tiles = LimitList([LimitList([el.wall() for y in range(self.height)]) for x in range(self.width)])
-    
     def get_tile(self, loc):
         x, y = loc
         return self.tiles[x][y]
@@ -68,9 +73,12 @@ class BigRoom(Terrain):
         super().__init__(id)
 
     def build(self, entry_loc=None):
-        self.fill_tiles()
         for x, y in [(x,y) for x in range(1, self.width - 1) for y in range(1, self.height - 1)]:
             self.tiles[x][y] = el.ground((x,y))
+
+        
+        self.create_motionmap()
+        self.create_sightmap()
 
 
 class BasicDungeon(Terrain):
@@ -103,7 +111,6 @@ class BasicDungeon(Terrain):
             self.tiles[x][y] = el.ground((x,y))
 
     def build(self, entry_loc=None):
-        self.fill_tiles()
         try:
             self.create_room_at(entry_loc)
         except TypeError: 
@@ -128,6 +135,9 @@ class BasicDungeon(Terrain):
                 self.create_v_tunnel(y1, y2, x2)
             except IndexError:
                 pass
+
+        self.create_motionmap()
+        self.create_sightmap()
 
 
 class MazeMap(Terrain):
@@ -177,7 +187,6 @@ class MazeMap(Terrain):
             raise ValueError('mazeMap must be odd width and height.')
         # Build new graph and clear existing tiles
         graph = self.build_graph((self.width // 2) + 1, (self.height // 2) + 1)
-        self.fill_tiles()
         
         # Update tiles from graph data
         for loc, edges in graph.items():
@@ -190,3 +199,7 @@ class MazeMap(Terrain):
             for p in path:
                 x, y = p
                 self.tiles[x][y] = el.ground(p)
+
+        
+        self.create_motionmap()
+        self.create_sightmap()

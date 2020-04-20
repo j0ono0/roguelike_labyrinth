@@ -62,17 +62,19 @@ def radar(loc):
 def player_character(name, loc):
     max_vision = max(MAP_WIDTH, MAP_HEIGHT)
     b = entity.Entity(
-        'player character', 
+        'human', 
         name, 
         entity.Location(loc), 
         {
-            'life': (entity.Life, [4]),
+            'life': (entity.Life, [4, 'good']),
             'percept': (entity.Perception, [max_vision]),
             'inventory': (entity.Inventory, [10]),
             'perform': (actions.PlayerInput, []),
-            'action': (actions.BlockTarget,[]),
+            'action': (actions.Defend,[]),
         }
     )
+    # Customise appearance
+    b.fg = [255,255,255]
     # Equip with initial starting items
     b.inventory.items.extend([locator(b.loc), radar(b.loc)])
     return b
@@ -84,7 +86,7 @@ def human(loc):
         None,
         entity.Location(loc),
         {
-            'life': (entity.Life, [random.randint(1,3)]),
+            'life': (entity.Life, [random.randint(3,5), 'bad']),
             'percept': (entity.Perception, [max_vision]),
             'inventory': (entity.Inventory, [10]),
             'perform': (actions.PersonalityA,[]),

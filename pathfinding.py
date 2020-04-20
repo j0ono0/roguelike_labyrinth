@@ -15,12 +15,17 @@ def cardinal_neighbours(x, y):
         return [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
     
 
-def neighbours(valid_locs, x, y):
-    return [(dx, dy) for dx in range(x-1, x+2) for dy in range(y-1, y+2) if (dx, dy) in valid_locs and (dx, dy) != (x, y)]
+def neighbours(graph, x, y):
+    x_min = max(x-1, 0)
+    x_max = min(x+2, len(graph))
+    y_min = max(y-1, 0)
+    y_max = min(y+2, len(graph[0]))
+    return [(dx, dy) for dx in range(x_min, x_max) for dy in range(y_min, y_max) if graph[dx][dy] == True and (dx, dy) != (x, y)]
 
 
 def astar(graph, start, end):
     # Algorith starts at destination and works backwards to find current location
+    # Graph 2d array, True on coordinates that allow motion
     frontier = []
     # Items are tuple: (<priority>, <location>)
     heapq.heappush(frontier, (0, start))
@@ -29,7 +34,6 @@ def astar(graph, start, end):
     
     while len(frontier) > 0:
         current = heapq.heappop(frontier)[1]
-
         if current == end:
             # Extract shortest path from visited
             path = []
@@ -40,15 +44,12 @@ def astar(graph, start, end):
             return path
 
         for loc in neighbours(graph, *current):
-            try:
-                if graph[loc] == True:
-                    priority = cost_tally[current] + distance(end, loc)
-                    if loc not in visited or priority < cost_tally[loc]:
-                        cost_tally[loc] = priority
-                        heapq.heappush(frontier, (priority, loc))
-                        visited[loc] = current
-            except KeyError:
-                """ coordinates out of map area """
+            priority = cost_tally[current] + distance(end, loc)
+            if loc not in visited or priority < cost_tally[loc]:
+                cost_tally[loc] = priority
+                heapq.heappush(frontier, (priority, loc))
+                visited[loc] = current
+            
             
     return []
     

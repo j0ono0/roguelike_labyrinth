@@ -74,7 +74,7 @@ class SelectMenu:
                     fg = [255,255,255]
                     bg = [0,0,0]
                     
-                y = y + display.con.print_box(1, y, NAR_WIDTH, 10, option.kind, fg, bg)
+                y = y + display.con.print_box(1, y, NAR_WIDTH, 10, option.__str__(), fg, bg)
 
             display.blit(True)
             

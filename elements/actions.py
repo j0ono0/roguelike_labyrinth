@@ -6,7 +6,7 @@ from user_interface.consoles import root_console as console
 from . import entity
 from user_interface import interfaces as ui
 from user_interface import keyboard
-from pathfinding import dijkstra
+import pathfinding as pf
 import field_of_view
 import dungeon_master as dm
 
@@ -94,15 +94,13 @@ class FleeMap:
 
     # Temporarly renders a contigueous section of map around parent.
     def __call__(self, target):
-        kb = keyboard.CharInput()
         emap = consoles.TerrainConsole()
-        graph = dm.terrain.unblocked_tiles()
-        costmap = dijkstra(graph, {self.parent.loc(): 0})[1]
+        graph = dm.terrain.motionmap
+        costmap = pf.dijkstra(graph, {self.parent.loc(): 0})[1]
         # Reverse movement costs so entity flees starting points
         # Recalculate Dijkstra algorithm
         costmap = {key:value * -1.175 for (key, value) in costmap.items()}
-        influence_map, resistance_map = dijkstra(graph, costmap)
-        
+        resistance_map = pf.dijkstra(graph, costmap)[1]
         
         # transpose value range to 0 to 255
         vmax = 0
@@ -122,7 +120,7 @@ class FleeMap:
             emap.con.draw_rect(*key, 1, 1, 0, bg=[r, g, b])
 
         emap.blit(True)
-        kb.capture_keypress()
+        keyboard.CharInput().capture_keypress()
 
 
 class Defend:
@@ -133,34 +131,47 @@ class Defend:
     def __call__(self, target):
         """ DEFEND """
         self.parent.life.damage(1)
+        ui.narrative.add(f"{target} inflicts 1pt of damage on {self.parent}.")
         
     
-
 ################################################
+
 
 class PersonalityA:
     def __init__(self, parent):
         self.parent = parent
 
     def __call__(self):
-        if self.parent.life.current < 2: 
-            fov = field_of_view.scan(self.parent.loc(), dm.terrain.field_of_view(), 3)
-            flee_source = {e.loc(): 0 for e in dm.entities if e.loc() in fov if e.kind == 'player character'}
-            if len(flee_source) > 0:
-                """ FLEE """
-                graph = dm.terrain.unblocked_tiles()
-                resistance_map = dijkstra(graph, flee_source)[1]
-                # Reverse movement costs so entity flees starting points
-                # Recalculate Dijkstra algorithm
-                resistance_map = {key:value * -1.175 for (key, value) in resistance_map.items()}
-                paths = dijkstra(graph, resistance_map)[0]
-                
-                loc = paths[self.parent.loc()]
-                target = dm.get_target(loc, True)
-                try:
-                    target.action(self.parent)
-                except AttributeError:
-                    ui.narrative.add('The {} needs less haste and more speed.'.format(target))
+        fov = field_of_view.scan(self.parent.loc(), dm.terrain.sightmap, 6)
+        foes = [e for e in dm.entities if e.loc() in fov and e.life() and e.life.personality != self.parent.life.personality]
+        try:
+            foe = foes[0]
+        except IndexError:
+            """ No foes are in range """ 
+            return
+
+        if self.parent.life.current > 2:
+            """ ATTACK """
+            path = dm.find_path(self.parent.loc(), foe.loc())
+            target = dm.get_target(path.pop(), True)
+
+        else:
+            """ FLEE """
+            resistance_map = pf.dijkstra(dm.terrain.motionmap, {foe.loc(): 0})[1]
+            # Reverse movement costs so entity flees starting points
+            # Recalculate Dijkstra algorithm
+            resistance_map = {key:value * -1.175 for (key, value) in resistance_map.items()}
+            paths = pf.dijkstra(dm.terrain.motionmap, resistance_map)[0]
+            loc = paths[self.parent.loc()]
+            target = dm.get_target(loc, True)
+            print('fleeing ', target.kind)
+        
+        try:
+            target.action(self.parent)
+        except AttributeError:
+            ui.narrative.add('The {} needs less haste and more speed.'.format(target.kind))
+            
+
 
 
 class PlayerInput:
@@ -181,6 +192,6 @@ class PlayerInput:
             print('The keyboard cmd does not have a function:', e)
 
         # update player field of view
-        self.parent.percept.see(dm.terrain.field_of_view())
+        self.parent.percept.see(dm.terrain.sightmap)
         dm.terrain.mark_as_seen(self.parent.percept.fov)
         
