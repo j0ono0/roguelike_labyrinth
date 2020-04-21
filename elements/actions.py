@@ -42,6 +42,8 @@ class MoveToLevel:
         self.return_entity = return_entity
 
     def __call__(self, target):
+        # Remove target from level before saving
+        dm.entities.members.remove(target)
         dm.save()
         
         try:
@@ -52,9 +54,9 @@ class MoveToLevel:
             dm.create(self.parent.loc())
             if self.return_entity:
                 self.return_entity.loc.update(self.parent.loc())
-                dm.entities.append(self.return_entity)
+                dm.entities.add(self.return_entity)
 
-        dm.entities.insert(0, target)
+        dm.entities.add(target)
                 
 
 class DisplayEntity:
@@ -164,7 +166,6 @@ class PersonalityA:
             paths = pf.dijkstra(dm.terrain.motionmap, resistance_map)[0]
             loc = paths[self.parent.loc()]
             target = dm.get_target(loc, True)
-            print('fleeing ', target.kind)
         
         try:
             target.action(self.parent)

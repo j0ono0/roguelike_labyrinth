@@ -45,9 +45,8 @@ class Inventory:
         self.items.insert(0, item)
 
     def pickup(self, target):
-        e = dm.entities
-        i = e.index(target)
-        self.add(e.pop(i))
+        dm.entities.remove(target)
+        self.add(target)
         target.loc = self.parent.loc
         ui.narrative.add('{} picks up a {}.'.format(self.parent.kind, target.kind))
 
@@ -55,7 +54,7 @@ class Inventory:
         try:
             i = self.items.index(target)
             target.loc = Location(target.loc())
-            dm.entities.append(self.items.pop(i))
+            dm.entities.add(self.items.pop(i))
             ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
         except ValueError:
             """
@@ -96,6 +95,8 @@ class Life:
             setattr(self.parent, attr, getattr(ELEMENTS['corpse'], attr))
         
         self.parent.del_ability('perform')
+
+        dm.entities.sort()
        
         
 
@@ -135,6 +136,28 @@ class Entity():
     def __str__(self):
         return f"{self.name}" if self.name else f"A {self.kind}" 
 
+    def __eq__(self, other):
+        if dir(self) ==  dir(other):
+            return True
+        return False
+
+    def __lt__(self, other):
+        attrs1 = dir(self)
+        attrs2 = dir(other)
+        if 'perform' in attrs2 and 'perform' not in attrs1:
+            return True
+        elif other.block.motion == True and self.block.motion == False:
+            return True
+        return False
+
+    def __gt__(self, other):
+        attrs1 = dir(self)
+        attrs2 = dir(other)
+        if 'perform' in attrs1 and 'perform' not in attrs2:
+            return True
+        elif self.block.motion == True and other.block.motion == False:
+            return True
+        return False
 
     def add_ability(self, name, ability):
         fn, args = ability

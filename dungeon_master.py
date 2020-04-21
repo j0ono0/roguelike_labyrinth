@@ -1,5 +1,11 @@
-import os, pickle, re, random
+import os
+import pickle
+import re 
+import random
+import bisect
+
 import tcod
+
 from user_interface import consoles
 from user_interface import interfaces as ui
 from elements import terrain as terra
@@ -9,9 +15,32 @@ from elements import library as el
 from elements import entity
 
 
+class EntityList:
+    def __init__(self, members=[]):
+        self.members = []
+        for member in members:
+            self.add(member)
+    
+    def __getitem__(self,index):
+         return self.members[index]
+    
+    def __iter__(self):
+        for m in self.members:
+            yield m
+
+    def sort(self):
+        self.members.sort()
+
+    def add(self, member):
+        bisect.insort_left(self.members, member)
+
+    def remove(self, member):
+        self.members.remove(member)
+
+
 #################
 # Module variables
-entities = []
+entities = EntityList()
 terrain = None
 #################
 
@@ -43,14 +72,15 @@ def create(entry_loc=None):
 
     terrain.build(entry_loc)
     
-    # Populate environment with some exits
-    stairs_up = el.stairs_up(tid)
-    stairs_down = el.stairs_down(tid+1, random_empty_loc(), stairs_up)
-    # Populate environment with some items
-    locator = el.locator(random_empty_loc())
-    person = el.human(random_empty_loc())
+    # Create new entities object to clear any preexisting members
+    entities = EntityList()
 
-    entities = ([stairs_down, locator, person])
+    # Populate with exits
+    stairs_up = el.stairs_up(tid)
+    entities.add(el.stairs_down(tid+1, random_empty_loc(), stairs_up))
+    # Populate environment with some items
+    entities.add(el.locator(random_empty_loc()))
+    entities.add(el.human(random_empty_loc()))
 
 
 def load(id):
@@ -65,7 +95,8 @@ def save():
     # remove player character(s) before saving
     game = {
         'environment': terrain,
-        'entities': [e for e in entities if e.kind != 'player character']
+        #'entities': [e for e in entities if e.kind != 'player character']
+        'entities': entities
     }
 
     filepath = os.path.join('gamedata', f'{LEVEL_PREFIX}{terrain.id}.pickle')
