@@ -55,6 +55,13 @@ class SelectMenu:
 
 
     def select(self, options):
+        
+        # Resolve edge cases first
+        if len(options) == 0:
+            return None
+        elif len(options) == 1:
+            return options[0]
+        
         display = consoles.NarrativeConsole()
         display.clear()
 
@@ -64,7 +71,7 @@ class SelectMenu:
         
         while selection == None:
             
-            display.con.print(1, 0, 'Inventory')
+            display.con.print(1, 0, self.title)
             y = 2
             for i, option in enumerate(options):
                 if i == index:

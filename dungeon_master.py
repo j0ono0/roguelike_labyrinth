@@ -14,32 +14,10 @@ from settings import *
 from elements import library as el
 
 
-class EntityList:
-    def __init__(self, members=[]):
-        self.members = []
-        for member in members:
-            self.add(member)
-    
-    def __getitem__(self,index):
-         return self.members[index]
-    
-    def __iter__(self):
-        for m in self.members:
-            yield m
-
-    def sort(self):
-        self.members.sort()
-
-    def add(self, member):
-        bisect.insort_left(self.members, member)
-
-    def remove(self, member):
-        self.members.remove(member)
-
 
 #################
 # Module variables
-entities = EntityList()
+entities = []
 terrain = None
 #################
 
@@ -72,14 +50,14 @@ def create(entry_loc=None):
     terrain.build(entry_loc)
     
     # Create new entities object to clear any preexisting members
-    entities = EntityList()
+    entities = []
 
     # Populate with exits
     stairs_up = el.stairs_up(tid)
-    entities.add(el.stairs_down(tid+1, random_empty_loc(), stairs_up))
+    bisect.insort_left(entities, el.stairs_down(tid+1, random_empty_loc(), stairs_up))
     # Populate environment with some items
-    entities.add(el.locator(random_empty_loc()))
-    entities.add(el.human(random_empty_loc()))
+    bisect.insort_left(entities, el.locator(random_empty_loc()))
+    bisect.insort_left(entities, el.human(random_empty_loc()))
 
 
 def load(id):

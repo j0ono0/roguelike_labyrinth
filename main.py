@@ -19,7 +19,7 @@ player = el.player_character('Deckard', dm.random_unblocked_loc())
 player.percept.see(dm.terrain.sightmap)
 dm.terrain.mark_as_seen(player.percept.fov)
 
-dm.entities.add(player)
+dm.entities.insert(0, player)
 ui.player_display.c = player
 
 # Initial render of screen

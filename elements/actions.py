@@ -43,7 +43,7 @@ class MoveToLevel:
 
     def __call__(self, target):
         # Remove target from level before saving
-        dm.entities.members.remove(target)
+        dm.entities.remove(target)
         dm.save()
         
         try:
@@ -54,9 +54,9 @@ class MoveToLevel:
             dm.create(self.parent.loc())
             if self.return_entity:
                 self.return_entity.loc.update(self.parent.loc())
-                dm.entities.add(self.return_entity)
+                dm.entities.append(self.return_entity)
 
-        dm.entities.add(target)
+        dm.entities.append(target)
                 
 
 class DisplayEntity:
@@ -153,8 +153,8 @@ class PersonalityA:
         except IndexError:
             """ No foes are in range """ 
             return
-
-        if self.parent.life.current > 2:
+            
+        if self.parent.life.current > 1:
             """ ATTACK """
             path = dm.find_path(self.parent.loc(), foe.loc())
             target = dm.get_target(path.pop(), True)

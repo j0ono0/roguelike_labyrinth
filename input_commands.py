@@ -4,7 +4,7 @@ Input commands are functions that are called from player input.
 All functions take a 'parent' (player's character) and 'args' (list of arguments). 
 
 """
-
+import bisect
 from settings import *
 import dungeon_master as dm
 from user_interface import interfaces as ui
@@ -52,24 +52,28 @@ def use_from_ground(parent, args):
         print(e)
 
 def pickup_select(parent, args):
-    targets = [t for t in dm.entities if t.loc() == parent.loc() and t != parent]
-    if len(targets) > 1:
+        targets = [t for t in dm.entities if t.loc() == parent.loc() and t != parent]
         menu = ui.SelectMenu('Pickup:')
         target = menu.select(targets)
-    elif len(targets) == 1:
-        target = targets.pop()
-    
-    try:
-        dm.entities.remove(target)
-        parent.inventory.add(target)
-    except NameError:
-        ui.narrative.add('There is nothing here to pickup.')
-
+        
+        try:
+            parent.inventory.add(target)
+            dm.entities.remove(target)
+            
+        except ValueError:
+            """ no target exists """
+            ui.narrative.add('There is nothing here to pickup.')
+   
 
 def drop_select(parent, args):
-    target = parent.inventory.remove_select()
-    dm.entities.add(target)
-    ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
+    menu = ui.SelectMenu('Drop from inventory')
+    target = menu.select(parent.inventory.items)
+    
+    bisect.insort_left(dm.entities, target)
+    parent.inventory.remove(target)
+    
+    ui.narrative.add('{} drops a {}.'.format(parent.name, target.name))
+
 
 
 def help(parent, args):

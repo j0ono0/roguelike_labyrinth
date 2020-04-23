@@ -40,15 +40,14 @@ class Inventory:
         self.max = max
         self.items = []
 
-    def add(self, item):
-        self.items.insert(0, item)
+    def add(self, target):
+        target.loc = self.parent.loc
+        self.items.insert(0, target)
         ui.narrative.add('{} picks up a {}.'.format(self.parent.name, target.name))
 
-    def remove_select(self, target):
-        menu = ui.SelectMenu('Inventory')
-        target = menu.select(self.items)
+    def remove(self, target):
+        target.loc = Location(target.loc())
         self.items.remove(target)
-        return target
 
 
 
@@ -106,30 +105,6 @@ class Combat:
 ###################
 
 
-
-class EntityList:
-    def __init__(self, members=[]):
-        self.members = []
-        for member in members:
-            self.add(member)
-    
-    def __getitem__(self,index):
-         return self.members[index]
-    
-    def __iter__(self):
-        for m in self.members:
-            yield m
-
-    def sort(self):
-        self.members.sort()
-
-    def add(self, member):
-        bisect.insort_left(self.members, member)
-
-    def remove(self, member):
-        self.members.remove(member)
-
-
 class Entity():
     def __init__(self, kind, name=None, loc=Location(), abilities={}):
         self.kind = kind
@@ -145,27 +120,14 @@ class Entity():
         
     def __str__(self):
         return f"{self.name}" if self.name else f"A {self.kind}" 
-
-    def __eq__(self, other):
-        if dir(self) ==  dir(other):
-            return True
-        return False
-
+   
+    # Used for bisect sort
     def __lt__(self, other):
         attrs1 = dir(self)
         attrs2 = dir(other)
         if 'perform' in attrs2 and 'perform' not in attrs1:
             return True
         elif other.block.motion == True and self.block.motion == False:
-            return True
-        return False
-
-    def __gt__(self, other):
-        attrs1 = dir(self)
-        attrs2 = dir(other)
-        if 'perform' in attrs1 and 'perform' not in attrs2:
-            return True
-        elif self.block.motion == True and other.block.motion == False:
             return True
         return False
 
