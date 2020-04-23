@@ -12,7 +12,6 @@ from elements import terrain as terra
 from pathfinding import astar
 from settings import *
 from elements import library as el
-from elements import entity
 
 
 class EntityList:
@@ -104,25 +103,6 @@ def save():
         pickle.dump(game, f)
     print(f'game environment {terrain.id} saved')
 
-def get_target(loc, block_motion=False):
-    # Return first item (or tile) at location
-    if block_motion == True:
-        return next(iter([e for e in entities if e.loc() == loc and e.block.motion == True]), terrain.get_tile(loc))
-    return next(iter([e for e in entities if e.loc() == loc]), terrain.get_tile(loc))
-    
-def find_path(start, end):
-    return astar(terrain.sightmap, start, end)
-
-
-def random_empty_loc():
-    entity_locs = set([e.loc for  e in entities])
-    unblocked_locs = set([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])
-    return random.choice(list(unblocked_locs.difference(entity_locs)))
-
-
-def random_unblocked_loc():
-    return random.choice([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])
-
 
 def blit(fov):
     display = consoles.TerrainConsole()
@@ -154,6 +134,7 @@ def blit(fov):
 
     display.blit()
 
+
 def render_game(fov):
         # Render updated interfaces to screen
         consoles.root_console.clear()
@@ -163,6 +144,26 @@ def render_game(fov):
         ui.player_display.blit()
         blit(fov)
         
-        #console.print(*(x + y for x, y in zip(MAP_OFFSET, self.parent.loc())), self.parent.glyph, self.parent.fg)
-        
         tcod.console_flush()
+
+
+
+def get_target(loc, block_motion=False):
+    # Return first item (or tile) at location
+    if block_motion == True:
+        return next(iter([e for e in entities if e.loc() == loc and e.block.motion == True]), terrain.get_tile(loc))
+    return next(iter([e for e in entities if e.loc() == loc]), terrain.get_tile(loc))
+    
+
+def find_path(start, end):
+    return astar(terrain.sightmap, start, end)
+
+
+def random_empty_loc():
+    entity_locs = set([e.loc for  e in entities])
+    unblocked_locs = set([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])
+    return random.choice(list(unblocked_locs.difference(entity_locs)))
+
+
+def random_unblocked_loc():
+    return random.choice([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])

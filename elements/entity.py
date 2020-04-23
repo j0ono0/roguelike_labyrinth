@@ -7,7 +7,6 @@ from collections import namedtuple
 import field_of_view
 from user_interface import interfaces as ui 
 from settings import ELEMENTS, Obj
-import dungeon_master as dm
 
 
 ###################
@@ -43,24 +42,14 @@ class Inventory:
 
     def add(self, item):
         self.items.insert(0, item)
+        ui.narrative.add('{} picks up a {}.'.format(self.parent.name, target.name))
 
-    def pickup(self, target):
-        dm.entities.remove(target)
-        self.add(target)
-        target.loc = self.parent.loc
-        ui.narrative.add('{} picks up a {}.'.format(self.parent.kind, target.kind))
+    def remove_select(self, target):
+        menu = ui.SelectMenu('Inventory')
+        target = menu.select(self.items)
+        self.items.remove(target)
+        return target
 
-    def drop(self, target):
-        try:
-            i = self.items.index(target)
-            target.loc = Location(target.loc())
-            dm.entities.add(self.items.pop(i))
-            ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
-        except ValueError:
-            """
-            Action aborted.
-            Keypress does not match any inventory items.
-            """
 
 
 class Perception:
@@ -90,13 +79,9 @@ class Life:
 
     def die(self):
         ui.narrative.add('{} dies'.format(self.parent))
-        
         for attr in Obj._fields:
             setattr(self.parent, attr, getattr(ELEMENTS['corpse'], attr))
-        
         self.parent.del_ability('perform')
-
-        dm.entities.sort()
        
         
 
@@ -119,6 +104,31 @@ class Combat:
 # Entities
 #
 ###################
+
+
+
+class EntityList:
+    def __init__(self, members=[]):
+        self.members = []
+        for member in members:
+            self.add(member)
+    
+    def __getitem__(self,index):
+         return self.members[index]
+    
+    def __iter__(self):
+        for m in self.members:
+            yield m
+
+    def sort(self):
+        self.members.sort()
+
+    def add(self, member):
+        bisect.insort_left(self.members, member)
+
+    def remove(self, member):
+        self.members.remove(member)
+
 
 class Entity():
     def __init__(self, kind, name=None, loc=Location(), abilities={}):

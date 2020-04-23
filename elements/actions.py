@@ -129,13 +129,15 @@ class Defend:
     def __init__(self, parent):
         self.parent = parent
 
-    # Temporarly renders a contigueous section of map around parent.
     def __call__(self, target):
         """ DEFEND """
         self.parent.life.damage(1)
-        ui.narrative.add(f"{target} inflicts 1pt of damage on {self.parent}.")
+        if self.parent.life() == True:
+            ui.narrative.add(f"{target} inflicts 1pt of damage on {self.parent}.")
+        else:
+            dm.entities.sort()
         
-    
+
 ################################################
 
 

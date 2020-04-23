@@ -54,17 +54,22 @@ def use_from_ground(parent, args):
 def pickup_select(parent, args):
     targets = [t for t in dm.entities if t.loc() == parent.loc() and t != parent]
     if len(targets) > 1:
-        """ display select menu here """
+        menu = ui.SelectMenu('Pickup:')
+        target = menu.select(targets)
     elif len(targets) == 1:
-        parent.inventory.pickup(targets.pop())
-    else:
+        target = targets.pop()
+    
+    try:
+        dm.entities.remove(target)
+        parent.inventory.add(target)
+    except NameError:
         ui.narrative.add('There is nothing here to pickup.')
 
 
 def drop_select(parent, args):
-    menu = ui.SelectMenu('Inventory')
-    target = menu.select(parent.inventory.items)
-    parent.inventory.drop(target)
+    target = parent.inventory.remove_select()
+    dm.entities.add(target)
+    ui.narrative.add('{} drops a {}.'.format(self.parent.name, target.name))
 
 
 def help(parent, args):
