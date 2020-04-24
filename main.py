@@ -21,8 +21,12 @@ dm.terrain.mark_as_seen(player.percept.fov)
 
 dm.entities.append( player)
 
-# Initial render of screen
-ui.player_display.c = player
+# Assign game assets to displays
+ui.player.c = player
+ui.game.entities = dm.entities
+ui.game.terrain = dm.terrain
+
+# Assign player to display and do initial render of screen
 dm.render_game(player.percept.fov)
 
 

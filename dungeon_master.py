@@ -64,50 +64,18 @@ def save():
     with open(filepath, 'wb') as f:
         pickle.dump(game, f)
     print(f'game environment {terrain.id} saved')
-
-
-def blit(fov):
-    display = consoles.TerrainConsole()
-
-    # Add terrain tiles to console
-    for x in range(MAP_WIDTH): 
-        for y in range(MAP_HEIGHT):
-            t = terrain.tiles[x][y]
-            if (x,y) in fov:
-                display.con.tiles[(x,y)] = (
-                    ord(t.glyph),
-                    t.fg + [255],
-                    t.bg + [255]
-                )
-            elif t.seen:
-                # Reduce color by 50% for unseen tiles
-                fg = [c*.5 for c in t.fg]
-                bg = [c*.5 for c in t.bg]
-                display.con.tiles[(x,y)] = (
-                    ord(t.glyph),
-                    fg + [255],
-                    bg + [255]
-                )
-            
-    # Add entities to console
-    for e in entities:
-        if e.loc() in fov:
-            display.con.print(*e.loc(), e.glyph, e.fg)
-
-    display.blit()
-
+    
 
 def render_game(fov):
         # Render updated interfaces to screen
         consoles.root_console.clear()
         consoles.render_base()
         
-        ui.player_display.blit()
+        ui.player.blit()
         ui.narrative.blit()
-        blit(fov)
+        ui.game.blit(fov)
         
         tcod.console_flush()
-
 
 
 def get_target(loc, block_motion=False):

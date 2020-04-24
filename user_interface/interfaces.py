@@ -108,6 +108,43 @@ class PlayerCharacter:
         display.con.print(0,1, f"{self.c.life.current}/{self.c.life.max}", fg, bg)
         display.blit()
 
+
+class GameEnvironment:
+    def __init__(self, entities=None, terrain=None):
+        self.entities = entities
+        self.terrain = terrain
+
+    def blit(self, fov):
+        display = consoles.TerrainConsole()
+
+        # Add terrain tiles to console
+        for x in range(MAP_WIDTH): 
+            for y in range(MAP_HEIGHT):
+                t = self.terrain.tiles[x][y]
+                if (x,y) in fov:
+                    display.con.tiles[(x,y)] = (
+                        ord(t.glyph),
+                        t.fg + [255],
+                        t.bg + [255]
+                    )
+                elif t.seen:
+                    # Reduce color by 50% for unseen tiles
+                    fg = [c*.5 for c in t.fg]
+                    bg = [c*.5 for c in t.bg]
+                    display.con.tiles[(x,y)] = (
+                        ord(t.glyph),
+                        fg + [255],
+                        bg + [255]
+                    )
+                
+        # Add entities to console
+        for e in self.entities:
+            if e.loc() in fov:
+                display.con.print(*e.loc(), e.glyph, e.fg)
+
+        display.blit()
+
 #################
-player_display = PlayerCharacter() # Assign character from main.py
+player = PlayerCharacter() # Assign character from main.py
 narrative = Narrative()
+game = GameEnvironment() # Assign entities and terrain from main.py
