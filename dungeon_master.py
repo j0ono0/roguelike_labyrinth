@@ -102,6 +102,7 @@ def render_game(fov):
         consoles.root_console.clear()
         consoles.render_base()
         
+        ui.player_display.blit()
         ui.narrative.blit()
         blit(fov)
         

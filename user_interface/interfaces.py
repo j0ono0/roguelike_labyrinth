@@ -109,5 +109,5 @@ class PlayerCharacter:
         display.blit()
 
 #################
-
+player_display = PlayerCharacter() # Assign character from main.py
 narrative = Narrative()
