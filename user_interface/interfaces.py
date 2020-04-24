@@ -111,4 +111,3 @@ class PlayerCharacter:
 #################
 
 narrative = Narrative()
-player_display = PlayerCharacter() # Assign character from main.py

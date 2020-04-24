@@ -6,7 +6,7 @@
 from collections import namedtuple
 import field_of_view
 from user_interface import interfaces as ui 
-from settings import ELEMENTS, Obj
+from settings import COMMON_TRAITS, Obj
 
 
 ###################
@@ -79,7 +79,7 @@ class Life:
     def die(self):
         ui.narrative.add('{} dies'.format(self.parent))
         for attr in Obj._fields:
-            setattr(self.parent, attr, getattr(ELEMENTS['corpse'], attr))
+            setattr(self.parent, attr, getattr(COMMON_TRAITS['consumable'], attr))
         self.parent.del_ability('perform')
        
         
@@ -104,22 +104,22 @@ class Combat:
 #
 ###################
 
-
 class Entity():
-    def __init__(self, kind, name=None, loc=Location(), abilities={}):
+    def __init__(self, kind, loc, glyph, fg, bg, block, abilities):
         self.kind = kind
-        self.name = name
-        self.loc = loc
-        self.glyph = ELEMENTS[kind].glyph
-        self.fg = ELEMENTS[kind].fg
-        self.bg = ELEMENTS[kind].bg
-        self.block = ELEMENTS[kind].block
+        self.loc = loc if isinstance(loc, Location) else Location(loc)
+        self.glyph = glyph
+        self.fg = fg
+        self.bg = bg
+        self.block = block
+            
+
         # Create properties for all kwargs
         for name, ability in abilities.items():
             self.add_ability(name, ability)
         
     def __str__(self):
-        return f"{self.name}" if self.name else f"A {self.kind}" 
+        return self.kind 
    
     # Used for bisect sort
     def __lt__(self, other):
@@ -141,10 +141,10 @@ class Entity():
 class Tile:
     def __init__(self, kind, abilities):
         self.kind = kind
-        self.glyph = ELEMENTS[kind].glyph
-        self.fg = ELEMENTS[kind].fg
-        self.bg = ELEMENTS[kind].bg
-        self.block = ELEMENTS[kind].block
+        self.glyph = COMMON_TRAITS[kind].glyph
+        self.fg = COMMON_TRAITS[kind].fg
+        self.bg = COMMON_TRAITS[kind].bg
+        self.block = COMMON_TRAITS[kind].block
         self.seen = False
         
         # Create properties for all kwargs

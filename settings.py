@@ -40,15 +40,15 @@ ACTION_KEYS = {
 Obj = namedtuple('Obj', ['glyph','fg', 'bg', 'block'])
 Block = namedtuple('Block', ['motion', 'sight'])
 
-ELEMENTS = {
+COMMON_TRAITS = {
     'player character': Obj('@', [255, 255, 255], [0, 0, 0], Block(True, False)),
-    'human':            Obj('@', [200, 160, 120], [0, 0, 0], Block(True, False)),
-    'stairs down':      Obj('>', [255, 255, 255], [0, 0, 0], Block(False, False)),
-    'stairs up':        Obj('<', [255, 255, 255], [0, 0, 0], Block(False, False)),
+    'human':            Obj('@', [255, 150, 180], [0, 0, 0], Block(True, False)),
+    'exit down':      Obj('>', [255, 255, 255], [0, 0, 0], Block(False, False)),
+    'exit up':        Obj('<', [255, 255, 255], [0, 0, 0], Block(False, False)),
     'tech device':      Obj('+', [120, 150, 110], [0, 0, 0], Block(False, False)),
+    'consumable':           Obj('%', [200, 120, 120], [0, 0, 0], Block(False, False)),
     'ground':           Obj('.', [60, 60, 60], [25, 25, 25], Block(False, False)),
     'wall':             Obj('#', [120, 120, 120], [25, 25, 25], Block(True, True)),
-    'corpse':           Obj('%', [200, 120, 120], [0, 0, 0], Block(False, False)),
 }
 
 HELP_TEXT = "\

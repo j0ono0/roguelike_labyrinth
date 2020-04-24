@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from elements import library as el
+from environment import library as el
 import dungeon_master as dm
 from user_interface import interfaces as ui
 from user_interface import keyboard
@@ -19,8 +19,7 @@ player = el.player_character('Deckard', dm.random_unblocked_loc())
 player.percept.see(dm.terrain.sightmap)
 dm.terrain.mark_as_seen(player.percept.fov)
 
-dm.entities.insert(0, player)
-ui.player_display.c = player
+dm.entities.append( player)
 
 # Initial render of screen
 dm.render_game(player.percept.fov)

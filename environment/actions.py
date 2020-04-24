@@ -34,6 +34,29 @@ class MoveTarget:
     def __call__(self, target):
         target.loc.update(self.loc)
 
+class RelocateTarget:
+    """
+    Move target to both new terrain and new location 
+    """
+    def __init__(self, parent, envid, coords):
+        self.parent = parent
+        self.envid = envid
+        self.coords = coords
+    
+    def __call__(self, target):
+        
+        dm.save()
+        
+        try:
+            dm.load(self.envid)
+            print(f'level {dm.terrain.id} loaded')
+        except FileNotFoundError:
+            print('Level not found. Creating new level')
+            dm.create(target.loc())
+
+        target.loc.update(self.coords)
+        dm.entities.append(target)
+
 
 class MoveToLevel:
     def __init__(self, parent, env_id=None, return_entity=None):

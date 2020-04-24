@@ -1,7 +1,7 @@
 import random
 import copy
 from collections import namedtuple
-from elements import library as el
+from . import library as el
 from settings import *
 
 Location = namedtuple('Location',['x', 'y'])

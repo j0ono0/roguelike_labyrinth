@@ -8,10 +8,11 @@ import tcod
 
 from user_interface import consoles
 from user_interface import interfaces as ui
-from elements import terrain as terra
+from environment import terrain as terra
+from environment import library as el
+from environment import build
 from pathfinding import astar
 from settings import *
-from elements import library as el
 
 
 
@@ -30,34 +31,17 @@ def delete_all():
 
 def create(entry_loc=None):
     global entities, terrain
+    
     #find highest id in gamedata
     filenames = os.listdir('gamedata')
     p = re.compile(r'_(?P<id>\d+)\.')
     ids = [int(p.search(i).group('id')) for i in filenames]
-    
     try:
-        tid = max(ids) + 1
+        envid = max(ids) + 1
     except ValueError:
-        tid = 1
+        envid = 1
 
-    if tid < 4:
-        terrain = terra.BasicDungeon(tid)
-    elif tid < 5:
-        terrain = terra.MazeMap(tid)
-    else:
-        terrain = terra.BigRoom(tid)
-
-    terrain.build(entry_loc)
-    
-    # Create new entities object to clear any preexisting members
-    entities = []
-
-    # Populate with exits
-    stairs_up = el.stairs_up(tid)
-    bisect.insort_left(entities, el.stairs_down(tid+1, random_empty_loc(), stairs_up))
-    # Populate environment with some items
-    bisect.insort_left(entities, el.locator(random_empty_loc()))
-    bisect.insort_left(entities, el.human(random_empty_loc()))
+    entities, terrain = build.environment(envid, entry_loc)
 
 
 def load(id):
@@ -119,7 +103,6 @@ def render_game(fov):
         consoles.render_base()
         
         ui.narrative.blit()
-        ui.player_display.blit()
         blit(fov)
         
         tcod.console_flush()
