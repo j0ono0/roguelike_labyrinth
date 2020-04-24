@@ -85,6 +85,7 @@ def help(parent, args):
     keyboard.CharInput().capture_keypress()
 
 def target_select(parent, args):
+    print('targetSelecting...')
     kb = keyboard.TargetInput()
     loc = parent.loc()
     seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if dm.terrain.tiles[x][y].seen == True]
@@ -121,7 +122,7 @@ def target_select(parent, args):
         display.con.print(0, 0, glyph, fg, bg)
         
         # Update screen
-        dm.blit(parent.percept.fov)
+        ui.game.blit(parent.percept.fov)
         narrative.blit()
         display.blit(loc, True)
         

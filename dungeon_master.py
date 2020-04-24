@@ -12,7 +12,7 @@ from environment import terrain as terra
 from environment import library as el
 from environment import build
 from pathfinding import astar
-from settings import *
+from settings import LEVEL_PREFIX, MAP_HEIGHT, MAP_WIDTH
 
 
 
@@ -28,6 +28,7 @@ def delete_all():
     for filename in levels:
         path = os.path.join('gamedata', filename)
         os.remove(path)
+
 
 def create(entry_loc=None):
     global entities, terrain
@@ -52,6 +53,7 @@ def load(id):
     terrain = data['environment']
     entities = data['entities']
 
+
 def save():
     # remove player character(s) before saving
     game = {
@@ -64,7 +66,7 @@ def save():
     with open(filepath, 'wb') as f:
         pickle.dump(game, f)
     print(f'game environment {terrain.id} saved')
-    
+
 
 def render_game(fov):
         # Render updated interfaces to screen
