@@ -92,7 +92,10 @@ class BasicDungeon(Terrain):
     def create_room(self, room):
         for x in range(room.x1 + 1, room.x2):
             for y in range(room.y1 + 1, room.y2):
-                self.tiles[x][y] = el.ground((x,y))
+                try:
+                    self.tiles[x][y] = el.ground((x,y))
+                except IndexError:
+                    """ Outside valid terrain coordinates """
     
     def create_room_at(self, loc):
             x, y = loc

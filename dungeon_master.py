@@ -20,6 +20,7 @@ from settings import LEVEL_PREFIX, MAP_HEIGHT, MAP_WIDTH
 # Module variables
 entities = []
 terrain = None
+pc = el.player_character('Deckard', (random.randint(4, MAP_WIDTH - 4), random.randint(4, MAP_HEIGHT - 4)))
 #################
 
 
@@ -40,6 +41,7 @@ def create(entry_loc=None):
     try:
         envid = max(ids) + 1
     except ValueError:
+        # New game
         envid = 1
 
     entities, terrain = build.environment(envid, entry_loc)
@@ -58,7 +60,7 @@ def save():
     # remove player character(s) before saving
     game = {
         'environment': terrain,
-        #'entities': [e for e in entities if e.kind != 'player character']
+        #'entities': [e for e in entities if e.name != 'player character']
         'entities': entities
     }
 
@@ -68,14 +70,15 @@ def save():
     print(f'game environment {terrain.id} saved')
 
 
-def render_game(fov):
-        # Render updated interfaces to screen
+def render_game():
+        fov = pc.percept.fov
+        
         consoles.root_console.clear()
         consoles.render_base()
         
-        ui.player.blit()
+        ui.render_character_info(pc)
         ui.narrative.blit()
-        ui.game.blit(fov)
+        ui.render_game(entities, terrain, fov)
         
         tcod.console_flush()
 

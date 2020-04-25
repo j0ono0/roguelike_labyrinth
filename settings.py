@@ -43,10 +43,11 @@ Block = namedtuple('Block', ['motion', 'sight'])
 COMMON_TRAITS = {
     'player character': Obj('@', [255, 255, 255], [0, 0, 0], Block(True, False)),
     'human':            Obj('@', [255, 150, 180], [0, 0, 0], Block(True, False)),
-    'exit down':      Obj('>', [255, 255, 255], [0, 0, 0], Block(False, False)),
-    'exit up':        Obj('<', [255, 255, 255], [0, 0, 0], Block(False, False)),
+    'exit down':        Obj('>', [255, 255, 255], [0, 0, 0], Block(False, False)),
+    'exit up':          Obj('<', [255, 255, 255], [0, 0, 0], Block(False, False)),
     'tech device':      Obj('+', [120, 150, 110], [0, 0, 0], Block(False, False)),
-    'consumable':           Obj('%', [200, 120, 120], [0, 0, 0], Block(False, False)),
+    'weapon':           Obj('/', [220, 220, 255], [0, 0, 0], Block(False, False)),
+    'consumable':       Obj('%', [200, 120, 120], [0, 0, 0], Block(False, False)),
     'ground':           Obj('.', [60, 60, 60], [25, 25, 25], Block(False, False)),
     'wall':             Obj('#', [120, 120, 120], [25, 25, 25], Block(True, True)),
 }

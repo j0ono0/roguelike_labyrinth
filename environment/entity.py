@@ -107,6 +107,7 @@ class Combat:
 class Entity():
     def __init__(self, kind, loc, glyph, fg, bg, block, abilities):
         self.kind = kind
+        self.title = None
         self.loc = loc if isinstance(loc, Location) else Location(loc)
         self.glyph = glyph
         self.fg = fg
@@ -117,9 +118,16 @@ class Entity():
         # Create properties for all kwargs
         for name, ability in abilities.items():
             self.add_ability(name, ability)
-        
+
+    @property
+    def name(self):
+        return self.__str__()
+
     def __str__(self):
-        return self.kind 
+        if self.title:
+            return f"{self.title} the {self.kind}"
+        else:
+            return self.kind 
    
     # Used for bisect sort
     def __lt__(self, other):
@@ -150,7 +158,11 @@ class Tile:
         # Create properties for all kwargs
         for name, ability in abilities.items():
             self.add_ability(name, ability)
-        
+    
+    @property
+    def name(self):
+        return self.__str__()
+
     def __str__(self):
         return self.kind
 

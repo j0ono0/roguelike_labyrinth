@@ -96,55 +96,44 @@ class SelectMenu:
         return selection
 
 
-class PlayerCharacter:
-    def __init__(self, character=None):
-        self.c = character
-
-    def blit(self):
-        fg = [160,160,160]
-        bg = [0,0,0]
-        display = consoles.CharacterConsole()
-        display.con.print(0,0, self.c.name, [0,0,0], [160,160,160])
-        display.con.print(0,1, f"{self.c.life.current}/{self.c.life.max}", fg, bg)
-        display.blit()
+def render_character_info(character):
+    fg = [160,160,160]
+    bg = [0,0,0]
+    display = consoles.CharacterConsole()
+    display.con.print(0,0, character.name, [0,0,0], [160,160,160])
+    display.con.print(0,1, f"{character.life.current}/{character.life.max}", fg, bg)
+    display.blit()
 
 
-class GameEnvironment:
-    def __init__(self, entities=None, terrain=None):
-        self.entities = entities
-        self.terrain = terrain
+def render_game(entities, terrain, fov):
+    display = consoles.TerrainConsole()
 
-    def blit(self, fov):
-        display = consoles.TerrainConsole()
+    # Add terrain tiles to console
+    for x in range(MAP_WIDTH): 
+        for y in range(MAP_HEIGHT):
+            t = terrain.tiles[x][y]
+            if (x,y) in fov:
+                display.con.tiles[(x,y)] = (
+                    ord(t.glyph),
+                    t.fg + [255],
+                    t.bg + [255]
+                )
+            elif t.seen:
+                # Reduce color by 50% for unseen tiles
+                fg = [c*.5 for c in t.fg]
+                bg = [c*.5 for c in t.bg]
+                display.con.tiles[(x,y)] = (
+                    ord(t.glyph),
+                    fg + [255],
+                    bg + [255]
+                )
+            
+    # Add entities to console
+    for e in entities:
+        if e.loc() in fov:
+            display.con.print(*e.loc(), e.glyph, e.fg)
 
-        # Add terrain tiles to console
-        for x in range(MAP_WIDTH): 
-            for y in range(MAP_HEIGHT):
-                t = self.terrain.tiles[x][y]
-                if (x,y) in fov:
-                    display.con.tiles[(x,y)] = (
-                        ord(t.glyph),
-                        t.fg + [255],
-                        t.bg + [255]
-                    )
-                elif t.seen:
-                    # Reduce color by 50% for unseen tiles
-                    fg = [c*.5 for c in t.fg]
-                    bg = [c*.5 for c in t.bg]
-                    display.con.tiles[(x,y)] = (
-                        ord(t.glyph),
-                        fg + [255],
-                        bg + [255]
-                    )
-                
-        # Add entities to console
-        for e in self.entities:
-            if e.loc() in fov:
-                display.con.print(*e.loc(), e.glyph, e.fg)
-
-        display.blit()
+    display.blit()
 
 #################
-player = PlayerCharacter() # Assign character from main.py
 narrative = Narrative()
-game = GameEnvironment() # Assign entities and terrain from main.py

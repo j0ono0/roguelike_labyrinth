@@ -85,7 +85,6 @@ def help(parent, args):
     keyboard.CharInput().capture_keypress()
 
 def target_select(parent, args):
-    print('targetSelecting...')
     kb = keyboard.TargetInput()
     loc = parent.loc()
     seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if dm.terrain.tiles[x][y].seen == True]
@@ -108,7 +107,7 @@ def target_select(parent, args):
             except IndexError:
                 """ No entities are at this location """
                 x, y = loc
-                txt = dm.terrain.tiles[x][y].kind
+                txt = dm.terrain.tiles[x][y].name
                 glyph = dm.terrain.tiles[x][y].glyph
 
             fg = [0,0,0]
@@ -122,8 +121,8 @@ def target_select(parent, args):
         display.con.print(0, 0, glyph, fg, bg)
         
         # Update screen
-        ui.game.blit(parent.percept.fov)
-        narrative.blit()
+        dm.render_game()
+        #narrative.blit()
         display.blit(loc, True)
         
         # Wait for keypress

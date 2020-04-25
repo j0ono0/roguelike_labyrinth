@@ -9,6 +9,8 @@ from user_interface import keyboard
 import pathfinding as pf
 import field_of_view
 import dungeon_master as dm
+import input_commands as cmd
+from line_of_sight import LineOfSight as los
 
 
 class Interact:
@@ -17,7 +19,7 @@ class Interact:
 
     def __call__(self, target):
         ui.narrative.add("{} interacts with {}".format(self.parent.name, target.name))
-        
+
 
 class BlockTarget:
     def __init__(self, parent):
@@ -58,28 +60,23 @@ class RelocateTarget:
         dm.entities.append(target)
 
 
-class MoveToLevel:
-    def __init__(self, parent, env_id=None, return_entity=None):
-        self.parent = parent
-        self.env_id = env_id
-        self.return_entity = return_entity
-
+class RangeAttack: 
+    def __init__(self, parent):
+        self.parent = parent    
+      
     def __call__(self, target):
-        # Remove target from level before saving
-        dm.entities.remove(target)
-        dm.save()
-        
-        try:
-            dm.load(self.env_id)
-            print(f'level {dm.terrain.id} loaded')
-        except FileNotFoundError:
-            print('Level not found. Creating new level')
-            dm.create(self.parent.loc())
-            if self.return_entity:
-                self.return_entity.loc.update(self.parent.loc())
-                dm.entities.append(self.return_entity)
+        ui.narrative.add('You aim the gun...')
+        loc = cmd.target_select(target, None)
+        aim = los(target.loc(), loc)
+        path = aim.path(map=dm.terrain.motionmap)
+        ui.narrative.add('And dial distance;')
+        ui.narrative.add('The gun kicks as charged metal crackles through the air.')
 
-        dm.entities.append(target)
+        for victim in [e for e in dm.entities if e.loc() in path and e != target]:
+            try:
+                victim.life.damage(random.randint(2,10))
+            except AttributeError:
+                ui.narrative.add(f'The {victim.name} smokes a little.')
                 
 
 class DisplayEntity:
@@ -162,6 +159,10 @@ class Defend:
         
 
 ################################################
+#
+# Personalities: triggered from 'perform' attr
+#
+################################################
 
 
 class PersonalityA:
@@ -195,10 +196,8 @@ class PersonalityA:
         try:
             target.action(self.parent)
         except AttributeError:
-            ui.narrative.add('The {} needs less haste and more speed.'.format(target.kind))
+            ui.narrative.add('The {} needs less haste and more speed.'.format(target.name))
             
-
-
 
 class PlayerInput:
     def __init__(self, parent):

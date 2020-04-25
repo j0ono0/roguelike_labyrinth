@@ -53,6 +53,14 @@ def radar(loc):
         Block(False, False),
         {'action': (actions.FleeMap, [])}
     )
+    
+def handgun(loc):
+    return entity.Entity(
+        'handgun',
+        loc, 
+        *COMMON_TRAITS['weapon'],
+        {'action': (actions.RangeAttack, [])}
+    )
 
 
 def stairs_down(loc, envid, coords=None):
@@ -91,14 +99,14 @@ def stairs_up(loc, envid, coords=None):
 def player_character(name, loc):
     e = human(loc)
     # Customise character
-    e.name = name
+    e.title = name
     e.fg = [255,255,255]
     e.perform = actions.PlayerInput(e)
     e.life = entity.Life(e, random.randint(4,10), 'good')
     e.inventory.max = 10
 
     # Equip with initial starting items
-    e.inventory.items.extend([scanner(e.loc), radar(e.loc)])
+    e.inventory.items.extend([scanner(e.loc), radar(e.loc), handgun(e.loc)])
     
     return e
 
