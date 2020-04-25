@@ -172,7 +172,7 @@ class PersonalityA:
 
     def __call__(self):
         fov = self.parent.percept.look(dm.terrain)
-        foes = [e for e in dm.entities if e.loc() in fov and e.life() and e.life.personality != self.parent.life.personality]
+        foes = [e for e in dm.entities if e.loc() in fov and hasattr(e,'life') and e.life() and e.life.personality != self.parent.life.personality]
         try:
             foe = foes[0]
         except IndexError:

@@ -50,6 +50,7 @@ def use_from_ground(parent, args):
         ui.narrative.add('You see no way to use the {}.'.format(target.name))
         print(e)
 
+
 def pickup_select(parent, args):
         targets = [t for t in dm.entities if t.loc() == parent.loc() and t != parent]
         menu = ui.SelectMenu('Pickup:')
@@ -74,7 +75,6 @@ def drop_select(parent, args):
     ui.narrative.add('{} drops a {}.'.format(parent.name, target.name))
 
 
-
 def help(parent, args):
     help_ui = consoles.NarrativeConsole()
     help_ui.clear()
@@ -83,16 +83,17 @@ def help(parent, args):
     help_ui.blit(True)
     keyboard.CharInput().capture_keypress()
 
+
 def target_select(parent, args):
     kb = keyboard.TargetInput()
     loc = parent.loc()
     seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if dm.terrain.tiles[x][y].seen == True]
     
-    narrative = consoles.NarrativeConsole()
+    target_narrative = consoles.NarrativeConsole()
     display = consoles.EntityConsole()
     
     while True:
-        narrative.clear()
+        target_narrative.clear()
         if loc in seen_tiles:
             try:
                 entities = [e for e in dm.entities if e.loc() == loc]
@@ -111,7 +112,7 @@ def target_select(parent, args):
 
             fg = [0,0,0]
             bg = [255,255,255]
-            narrative.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, txt, [255, 255, 255], [0, 0, 0])
+            target_narrative.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, txt, [255, 255, 255], [0, 0, 0])
         else:
             glyph = ' '
             fg = [0,0,0]
@@ -121,7 +122,7 @@ def target_select(parent, args):
         
         # Update screen
         dm.render_game()
-        #narrative.blit()
+        target_narrative.blit()
         display.blit(loc, True)
         
         # Wait for keypress
