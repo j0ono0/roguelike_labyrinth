@@ -35,12 +35,16 @@ def environment(envid, entry_loc):
     
     vacant_locs = terrain.unblocked_tiles()
     random.shuffle(vacant_locs)
-    # Create and place entities with predetermined locations
     
-    # Create and place entities at random vacant locations
+    # Create and place entities
+    if envid > 1:
+        exit_up = el.stairs_up(entry_loc, terrain.id-1)
+        bisect.insort_left(entities, exit_up)
     
-    exit_down = el.stairs_down(vacant_locs.pop(), terrain.id+1)
-    bisect.insort_left(entities, exit_down)
+    
+    if envid < 6:
+        exit_down = el.stairs_down(vacant_locs.pop(), terrain.id+1)
+        bisect.insort_left(entities, exit_down)
 
     radar = el.radar(vacant_locs.pop())
     bisect.insort_left(entities, radar)

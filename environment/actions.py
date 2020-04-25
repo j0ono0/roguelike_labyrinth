@@ -1,4 +1,5 @@
 import random
+import bisect
 import tcod
 from settings import *
 from user_interface import consoles
@@ -35,6 +36,7 @@ class MoveTarget:
     
     def __call__(self, target):
         target.loc.update(self.loc)
+
 
 class RelocateTarget:
     """

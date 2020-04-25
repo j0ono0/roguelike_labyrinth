@@ -19,7 +19,6 @@ dm.terrain.mark_as_seen(dm.pc.percept.fov)
 
 dm.entities.append(dm.pc)
 
-
 # Assign player to display and do initial render of screen
 dm.render_game()
 

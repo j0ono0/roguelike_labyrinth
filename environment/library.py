@@ -76,6 +76,7 @@ def stairs_down(loc, envid, coords=None):
         {'action': (actions.RelocateTarget, [envid, coords])}
     )
 
+
 def stairs_up(loc, envid, coords=None):
     coords = coords or loc
     # Ensure coords are not a location object
