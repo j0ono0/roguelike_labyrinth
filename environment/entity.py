@@ -57,6 +57,14 @@ class Perception:
         self.max_vision = max_vision
         self.fov = []
  
+    def look(self, terrain):
+        if not self.fov or self.fov[0] != self.parent.loc():
+            # Entity has moved since last calculating field-of-view
+            # Rescan FoV
+            self.fov = field_of_view.scan(self.parent.loc(), terrain.sightmap, self.max_vision)
+            print(f'rescanning FoV of {self.parent.name}')
+        return self.fov
+
     def see(self, terrain):
         self.fov = field_of_view.scan(self.parent.loc(), terrain, self.max_vision)
 

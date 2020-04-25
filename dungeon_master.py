@@ -60,8 +60,7 @@ def save():
     # remove player character(s) before saving
     game = {
         'environment': terrain,
-        #'entities': [e for e in entities if e.name != 'player character']
-        'entities': entities
+        'entities': [e for e in entities if e != pc]
     }
 
     filepath = os.path.join('gamedata', f'{LEVEL_PREFIX}{terrain.id}.pickle')
