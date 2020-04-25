@@ -2,7 +2,6 @@ import os
 import pickle
 import re 
 import random
-import bisect
 
 import tcod
 
@@ -15,10 +14,9 @@ from pathfinding import astar
 from settings import LEVEL_PREFIX, MAP_HEIGHT, MAP_WIDTH
 
 
-
 #################
 # Module variables
-entities = []
+entities = None
 terrain = None
 pc = el.player_character('Deckard', (random.randint(4, MAP_WIDTH - 4), random.randint(4, MAP_HEIGHT - 4)))
 #################

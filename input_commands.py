@@ -4,7 +4,6 @@ Input commands are functions that are called from player input.
 All functions take a 'parent' (player's character) and 'args' (list of arguments). 
 
 """
-import bisect
 from settings import *
 import dungeon_master as dm
 from user_interface import interfaces as ui
@@ -69,7 +68,7 @@ def drop_select(parent, args):
     menu = ui.SelectMenu('Drop from inventory')
     target = menu.select(parent.inventory.items)
     
-    bisect.insort_left(dm.entities, target)
+    dm.entities.add(target)
     parent.inventory.remove(target)
     
     ui.narrative.add('{} drops a {}.'.format(parent.name, target.name))

@@ -1,5 +1,4 @@
 import random
-import bisect
 import tcod
 from settings import *
 from user_interface import consoles
