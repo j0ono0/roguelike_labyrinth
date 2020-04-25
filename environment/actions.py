@@ -58,6 +58,8 @@ class RelocateTarget:
             dm.create(target.loc())
 
         target.loc.update(self.coords)
+        # target has not moved loc so needs forced fov update
+        target.percept.look(dm.terrain)
         dm.entities.append(target)
 
 
@@ -218,6 +220,6 @@ class PlayerInput:
             print('The keyboard cmd does not have a function:', e)
 
         # update player field of view
-        self.parent.percept.see(dm.terrain.sightmap)
+        self.parent.percept.look(dm.terrain)
         dm.terrain.mark_as_seen(self.parent.percept.fov)
         

@@ -83,6 +83,21 @@ def help(parent, args):
     help_ui.blit(True)
     keyboard.CharInput().capture_keypress()
 
+def tag_entity(parent, args):
+    loc = target_select(parent, None)
+    target = next((e for e in dm.entities if e.loc() == loc and hasattr(e, 'life')), None)
+    tag = ' (suspect: android)'
+    if tag in target.name:
+        # Remove tag
+        target.title = None
+        target.fg = COMMON_TRAITS[target.kind].fg
+        target.bg = COMMON_TRAITS[target.kind].bg
+    else:
+        # Tag target
+        target.title = target.kind + tag
+        target.fg = [0, 0, 0]
+        target.bg = [100, 100, 200]
+
 
 def target_select(parent, args):
     kb = keyboard.TargetInput()

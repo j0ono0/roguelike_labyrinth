@@ -131,7 +131,7 @@ def render_game(entities, terrain, fov):
     # Add entities to console
     for e in entities:
         if e.loc() in fov:
-            display.con.print(*e.loc(), e.glyph, e.fg)
+            display.con.print(*e.loc(), e.glyph, e.fg, e.bg)
 
     display.blit()
 

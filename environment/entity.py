@@ -50,7 +50,6 @@ class Inventory:
         self.items.remove(target)
 
 
-
 class Perception:
     def __init__(self, parent, max_vision):
         self.parent = parent
@@ -58,15 +57,10 @@ class Perception:
         self.fov = []
  
     def look(self, terrain):
-        if self.fov:
         if not self.fov or self.fov[0] != self.parent.loc():
             # Entity has moved since last calculating field-of-view
-            # Rescan FoV
             self.fov = field_of_view.scan(self.parent.loc(), terrain.sightmap, self.max_vision)
         return self.fov
-
-    def see(self, terrain):
-        self.fov = field_of_view.scan(self.parent.loc(), terrain, self.max_vision)
 
 
 class Life:
@@ -133,7 +127,7 @@ class Entity():
 
     def __str__(self):
         if self.title:
-            return f"{self.title} the {self.kind}"
+            return self.title
         else:
             return self.kind 
    

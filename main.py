@@ -14,7 +14,7 @@ dm.create(dm.pc.loc())
 
 
 # update player field of view
-dm.pc.percept.see(dm.terrain.sightmap)
+dm.pc.percept.look(dm.terrain)
 dm.terrain.mark_as_seen(dm.pc.percept.fov)
 
 dm.entities.append(dm.pc)

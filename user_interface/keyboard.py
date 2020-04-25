@@ -102,11 +102,12 @@ class GameInput(InputHandler):
             #tcod.event.K_i: (cmd.use,['inventory']),
             tcod.event.K_o: ('operate',[]),
             tcod.event.K_r: ('replay',[]),
-            tcod.event.K_t: (cmd.target_select,[]),
+            tcod.event.K_t: (cmd.tag_entity,[]),
             tcod.event.K_u: (cmd.use,[]),
             tcod.event.K_w: ('wield',[]),
         }
         self.caps_keymap = {
+            tcod.event.K_t: (cmd.target_select,[]),
             tcod.event.K_u: (cmd.use_from_ground,[]),
         }
 
