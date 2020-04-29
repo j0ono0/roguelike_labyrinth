@@ -40,7 +40,7 @@ def environment(envid, entry_loc):
     vacant_locs = terrain.unblocked_tiles()
     random.shuffle(vacant_locs)
     
-    # Create and place entities
+    # Exits
     if envid > 1:
         exit_up = el.stairs_up(entry_loc, terrain.id-1)
         entities.add(exit_up)
@@ -50,12 +50,21 @@ def environment(envid, entry_loc):
         exit_down = el.stairs_down(vacant_locs.pop(), terrain.id+1)
         entities.add(exit_down)
 
+    # Items
     radar = el.radar(vacant_locs.pop())
     entities.add(radar)
 
 
-    for i in range(random.randint(3,5)):
-        e = el.human(vacant_locs.pop())
+    # Beings
+    for i in range(random.randint(4,7)):
+        j = random.randint(1,100)
+        if j >= 10:
+            e = el.android(vacant_locs.pop(), random.choice(['a','b']))
+        elif j >= 30:
+            e = el.android(vacant_locs.pop(), random.choice(['a','b']))
+        else:
+            e = el.human(vacant_locs.pop())
+        
         entities.add(e)
 
     return (entities, terrain)

@@ -126,3 +126,17 @@ def human(loc):
         }
     )
 
+def android(loc, version = 'a'):
+    andr_type = 'android ' + version
+    return entity.Entity(
+        andr_type,
+        loc, 
+        *COMMON_TRAITS[andr_type],
+        {
+            'life': (entity.Life, [random.randint(2,5), 'neutral']),
+            'percept': (entity.Perception, [max(MAP_WIDTH, MAP_HEIGHT)]),
+            'inventory': (entity.Inventory, [5]),
+            'perform': (actions.PersonalityA,[]),
+            'action': (actions.Defend, []),
+        }
+    )

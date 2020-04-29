@@ -184,7 +184,16 @@ class PersonalityA:
         if self.parent.life.current > 1:
             """ ATTACK """
             path = dm.find_path(self.parent.loc(), foe.loc())
-            target = dm.get_target(path.pop(), True)
+            try:
+                target = dm.get_target(path.pop(), True)
+                if isinstance(target, entity.Entity) and target not in foes:
+                    """ a friendly entity blocks the way """
+                    ui.narrative.add(f'{target.name} blocks the way of {self.parent.name}.')
+                    return
+            except IndexError as e:
+                """ there is no unblocked path to the foe """
+                # TODO: if being in way plot path and more as far a possible
+                return
 
         else:
             """ FLEE """

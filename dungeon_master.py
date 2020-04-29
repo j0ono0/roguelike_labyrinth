@@ -2,6 +2,7 @@ import os
 import pickle
 import re 
 import random
+from copy import deepcopy
 
 import tcod
 
@@ -87,8 +88,16 @@ def get_target(loc, block_motion=False):
     return next(iter([e for e in entities if e.loc() == loc]), terrain.get_tile(loc))
     
 
-def find_path(start, end):
-    return astar(terrain.sightmap, start, end)
+def find_path(start, end, avoid_blocking_entities=False):
+    if avoid_blocking_entities == True:
+        motionmap = deepcopy(terrain.motionmap)
+        for x, y in [e.loc() for e in entities if e.block.motion == True and e.loc() not in [start, end]]:
+            motionmap[x][y] = False
+    else:
+        motionmap = terrain.motionmap
+    
+    path = astar(motionmap, start, end)
+    return path
 
 
 def random_empty_loc():

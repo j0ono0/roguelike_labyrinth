@@ -43,6 +43,8 @@ Block = namedtuple('Block', ['motion', 'sight'])
 COMMON_TRAITS = {
     'player character': Obj('@', [255, 255, 255], [0, 0, 0], Block(True, False)),
     'human':            Obj('@', [255, 150, 180], [0, 0, 0], Block(True, False)),
+    'android a':        Obj('@', [160, 160, 255], [0, 0, 0], Block(True, False)),
+    'android b':        Obj('@', [120, 120, 255], [0, 0, 0], Block(True, False)),
     'exit down':        Obj('>', [255, 255, 255], [0, 0, 0], Block(False, False)),
     'exit up':          Obj('<', [255, 255, 255], [0, 0, 0], Block(False, False)),
     'tech device':      Obj('+', [120, 150, 110], [0, 0, 0], Block(False, False)),
