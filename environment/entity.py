@@ -64,18 +64,26 @@ class Perception:
 
 
 class Life:
-    def __init__(self, parent, max, personality=None):
+    p_max = 10
+    p_min = -10
+    def __init__(self, parent, health_max, personality=0):
         self.parent = parent
-        self.max = max
-        self.current = max
-        self.personality = personality
+        self.health_max = health_max
+        self.health_current = health_max
+        # Personality is a 'spectrum' expressed as int
+        # +10: extremist anti-android and pro-life
+        # -10: extremist pro-android and anti-life
+        self.personality = min(self.p_max, max(self.p_min, personality))
 
     def __call__(self):
-        return self.current > 0
+        return self.health_current > 0
+
+    def demeanor(self, target):
+        return  target.life.personality - self.personality
 
     def damage(self, num):
-        self.current = self.current - num
-        if self.current <= 0:
+        self.health_current = self.health_current - num
+        if self.health_current <= 0:
             self.die()
 
     def die(self):

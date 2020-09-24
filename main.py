@@ -8,6 +8,9 @@ from user_interface import keyboard
 # Delete existing saved levels
 dm.delete_all()
 
+# Create player character
+dm.create_pc('Dekard')
+
 # Create first environmentexit()
 print('Creating starting level')
 dm.create(dm.pc.loc())
@@ -31,11 +34,11 @@ while dm.pc.life():
         # Entities perform in turn
         try:
             e.perform()
+            # Rerender after each turn
+            dm.render_game()
         except AttributeError:
             """ this entity has no personality """
         
-        # Rerender after each turn
-        dm.render_game()
 
 print('the game is over. The player character is dead beyond repair.')
 print('press a key to exit.')

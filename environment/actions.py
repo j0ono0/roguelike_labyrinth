@@ -181,7 +181,7 @@ class PersonalityA:
             """ No foes are in range """ 
             return
             
-        if self.parent.life.current > 1:
+        if self.parent.life.health_current > 1:
             """ ATTACK """
             path = dm.find_path(self.parent.loc(), foe.loc())
             try:

@@ -19,9 +19,13 @@ from settings import LEVEL_PREFIX, MAP_HEIGHT, MAP_WIDTH
 # Module variables
 entities = None
 terrain = None
-pc = el.player_character('Deckard', (random.randint(4, MAP_WIDTH - 4), random.randint(4, MAP_HEIGHT - 4)))
+#pc = el.player_character('Deckard', (random.randint(4, MAP_WIDTH - 4), random.randint(4, MAP_HEIGHT - 4)))
+pc = None
 #################
 
+def create_pc(name='Dekard'):
+    global pc
+    pc = el.player_character(name, (random.randint(4, MAP_WIDTH - 4), random.randint(4, MAP_HEIGHT - 4)))
 
 def delete_all():
     levels = [n for n in os.listdir('gamedata') if n[:len(LEVEL_PREFIX)] == LEVEL_PREFIX]

@@ -101,7 +101,7 @@ def render_character_info(character):
     bg = [0,0,0]
     display = consoles.CharacterConsole()
     display.con.print(0,0, character.name, [0,0,0], [160,160,160])
-    display.con.print(0,1, f"{character.life.current}/{character.life.max}", fg, bg)
+    display.con.print(0,1, f"{character.life.health_current}/{character.life.health_max}", fg, bg)
     display.blit()
 
 

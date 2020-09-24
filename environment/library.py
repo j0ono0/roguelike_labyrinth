@@ -103,7 +103,7 @@ def player_character(name, loc):
     e.title = name
     e.fg = [255,255,255]
     e.perform = actions.PlayerInput(e)
-    e.life = entity.Life(e, random.randint(4,10), 'good')
+    e.life = entity.Life(e, random.randint(4,10), 5)
     e.inventory.max = 10
 
     # Equip with initial starting items
@@ -118,7 +118,7 @@ def human(loc):
         loc, 
         *COMMON_TRAITS['human'],
         {
-            'life': (entity.Life, [random.randint(2,5), 'neutral']),
+            'life': (entity.Life, [random.randint(2,5), random.randint(-2,5)]),
             'percept': (entity.Perception, [max(MAP_WIDTH, MAP_HEIGHT)]),
             'inventory': (entity.Inventory, [5]),
             'perform': (actions.PersonalityA,[]),
@@ -133,7 +133,7 @@ def android(loc, version = 'a'):
         loc, 
         *COMMON_TRAITS[andr_type],
         {
-            'life': (entity.Life, [random.randint(2,5), 'neutral']),
+            'life': (entity.Life, [random.randint(2,5), random.randint(-7,2)]),
             'percept': (entity.Perception, [max(MAP_WIDTH, MAP_HEIGHT)]),
             'inventory': (entity.Inventory, [5]),
             'perform': (actions.PersonalityA,[]),
