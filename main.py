@@ -5,6 +5,21 @@ from user_interface import interfaces as ui
 from user_interface import keyboard
 
 
+###################################
+dm2 = dm.DungeonMaster()
+
+while dm2.pc.life():
+
+    dm2.progress_game()
+        
+
+print('the game is over. The player character is dead beyond repair.')
+print('press a key to exit.')
+keyboard.CharInput().capture_keypress()
+
+
+###################################
+"""
 # Delete existing saved levels
 dm.delete_all()
 
@@ -37,9 +52,11 @@ while dm.pc.life():
             # Rerender after each turn
             dm.render_game()
         except AttributeError:
-            """ this entity has no personality """
+            #this entity has no personality
+            pass
         
 
 print('the game is over. The player character is dead beyond repair.')
 print('press a key to exit.')
 keyboard.CharInput().capture_keypress()
+"""

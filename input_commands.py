@@ -5,53 +5,44 @@ All functions take a 'parent' (player's character) and 'args' (list of arguments
 
 """
 from settings import *
-import dungeon_master as dm
 from user_interface import interfaces as ui
 from user_interface import consoles
 from user_interface import keyboard
 
-def move(parent, args):
+
+def move(dm, parent, args):
     try:
         loc = parent.loc.proposed(args)
         target = dm.get_target(loc, True)
-        try:
-            target.action(parent)
-        except AttributeError as e:
-            print(e)
+
+        if not target.block.motion:
+            parent.loc.update(loc)
+        else:
             ui.narrative.add('The {} blocks your way.'.format(target.name))
-    except IndexError as e:
+
+    except IndexError:
         # Player reached edge of environment
         ui.narrative.add('There is no way through here!')
+    
 
-
-def use(parent, args):
+def use(dm, parent, args):
     menu = ui.SelectMenu('Use from inventory:')
     target = menu.select(parent.inventory.items)
-    
-    # TODO enable player initiated use of items on ground
-    
-    try:
-        target.action(parent)
-    except AttributeError as e:
-        ui.narrative.add('You see no way to use the {}.'.format(target.name))
-        print(e)
+    return target.react
 
 
-def use_from_ground(parent, args):
+def use_from_ground(dm, parent, args):
     menu = ui.SelectMenu('Use from nearby:')
     items = [e for e in dm.entities if e.loc() == parent.loc() and e is not parent]
     target = menu.select(items)
     
     # TODO enable player initiated use of items on ground
+    return target.react
     
-    try:
-        target.action(parent)
-    except AttributeError as e:
-        ui.narrative.add('You see no way to use the {}.'.format(target.name))
-        print(e)
 
 
-def pickup_select(parent, args):
+
+def pickup_select(dm, parent, args):
         targets = [t for t in dm.entities if t.loc() == parent.loc() and t != parent]
         menu = ui.SelectMenu('Pickup:')
         target = menu.select(targets)
@@ -65,7 +56,7 @@ def pickup_select(parent, args):
             ui.narrative.add('There is nothing here to pickup.')
    
 
-def drop_select(parent, args):
+def drop_select(dm, parent, args):
     menu = ui.SelectMenu('Drop from inventory')
     target = menu.select(parent.inventory.items)
     
@@ -75,7 +66,7 @@ def drop_select(parent, args):
     ui.narrative.add('{} drops a {}.'.format(parent.name, target.name))
 
 
-def help(parent, args):
+def help(dm, parent, args):
     help_ui = consoles.NarrativeConsole()
     help_ui.clear()
     help_ui.blit(True)
@@ -83,7 +74,7 @@ def help(parent, args):
     help_ui.blit(True)
     keyboard.CharInput().capture_keypress()
 
-def tag_entity(parent, args):
+def tag_entity(dm, parent, args):
     loc = target_select(parent, None)
     target = next((e for e in dm.entities if e.loc() == loc and hasattr(e, 'life')), None)
     tag = ' (suspect: android)'
@@ -99,7 +90,7 @@ def tag_entity(parent, args):
         target.bg = [100, 100, 200]
 
 
-def target_select(parent, args):
+def target_select(dm, parent, args):
     kb = keyboard.TargetInput()
     loc = parent.loc()
     seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if dm.terrain.tiles[x][y].seen == True]

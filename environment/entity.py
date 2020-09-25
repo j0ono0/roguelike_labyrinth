@@ -115,7 +115,7 @@ class Combat:
 ###################
 
 class Entity():
-    def __init__(self, kind, loc, glyph, fg, bg, block, abilities):
+    def __init__(self, kind, loc, glyph, fg, bg, block, act, react, abilities=None):
         self.kind = kind
         self.title = None
         self.loc = loc if isinstance(loc, Location) else Location(loc)
@@ -123,11 +123,14 @@ class Entity():
         self.fg = fg
         self.bg = bg
         self.block = block
+        self.act = act
+        self.react = react
             
-
         # Create properties for all kwargs
-        for name, ability in abilities.items():
-            self.add_ability(name, ability)
+        if abilities:
+            for name, ability in abilities.items():
+                self.add_ability(name, ability)
+            
 
     @property
     def name(self):
@@ -150,14 +153,14 @@ class Entity():
         return False
 
     def add_ability(self, name, ability):
-        fn, args = ability
-        setattr(self, name, fn(self, *args))
+        klass, args = ability
+        setattr(self, name, klass(self, *args))
 
     def del_ability(self, name):
         delattr(self, name)
 
 class Tile:
-    def __init__(self, kind, abilities):
+    def __init__(self, kind, abilities=None):
         self.kind = kind
         self.glyph = COMMON_TRAITS[kind].glyph
         self.fg = COMMON_TRAITS[kind].fg
@@ -165,9 +168,10 @@ class Tile:
         self.block = COMMON_TRAITS[kind].block
         self.seen = False
         
-        # Create properties for all kwargs
-        for name, ability in abilities.items():
-            self.add_ability(name, ability)
+        # Create properties for abilities
+        if abilities:
+            for name, ability in abilities.items():
+                self.add_ability(name, ability)
     
     @property
     def name(self):

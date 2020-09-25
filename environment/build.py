@@ -66,5 +66,5 @@ def environment(envid, entry_loc):
             e = el.human(vacant_locs.pop())
         
         entities.add(e)
-
+    
     return (entities, terrain)

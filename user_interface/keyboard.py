@@ -48,6 +48,7 @@ class InputHandler:
                             return self.keymap[event.sym]
                         except KeyError:
                             """ key is not registed to a function """
+                            print(" key is not registed to a function ")
 
                 elif event.type == 'QUIT':
                     # Halt the script using SystemExit
