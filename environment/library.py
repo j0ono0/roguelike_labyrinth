@@ -33,15 +33,19 @@ def wall():
 
 
 def scanner(loc):
+    return entity.Scanner(loc)
+    """ 
     return entity.Entity(
         'scanner', 
         loc,
         *COMMON_TRAITS['tech device'],
-        (actions.no_act, []),
         (actions.display_entity_type, []),
-    )
+    ) 
+    """
 
 def radar(loc):
+    return entity.Radar(loc)
+    """ 
     return entity.Entity(
         'radar',
         loc, 
@@ -49,18 +53,20 @@ def radar(loc):
         [120, 150, 110], 
         [0, 0, 0], 
         Block(False, False),
-        (actions.no_act, []),
         (actions.flee_map, []),
     )
+    """
     
 def handgun(loc):
+    return entity.HandGun(loc)
+    """
     return entity.Entity(
         'handgun',
         loc, 
         *COMMON_TRAITS['weapon'],
-        (actions.no_act, []),
         (actions.no_react, []),
     )
+    """
 
 
 def stairs_down(loc, envid, coords=None):
@@ -73,7 +79,6 @@ def stairs_down(loc, envid, coords=None):
         'stairs down',
         loc,
         *COMMON_TRAITS['exit down'],
-        (actions.no_act, []),
         (actions.no_react, []),
     )
 
@@ -88,7 +93,6 @@ def stairs_up(loc, envid, coords=None):
         'stairs up',
         loc,
         *COMMON_TRAITS['exit up'],
-        (actions.no_act, []),
         (actions.no_react, []),
     )
 
@@ -105,24 +109,37 @@ def player_character(name, loc):
     e.title = name
     e.fg = [255,255,255]
     e.life = entity.Life(e, random.randint(4,10), 5)
+    e.initiative.modifier += 1
     e.inventory.max = 10
-    e.act = (actions.player_input, [])
+    e.act = entity.PlayerInput(e)
 
     # Equip with initial starting items
     e.inventory.items.extend([scanner(e.loc), radar(e.loc), handgun(e.loc)])
     
     return e
 
+def cat(loc):
+    return entity.Entity(
+        'cat',
+        loc,
+        *COMMON_TRAITS['feline'],
+        abilities = {
+            'act': (entity.Follower, []),
+            'life': (entity.Life, [random.randint(2,5), random.randint(-2,5)]),
+            'initiative': (entity.Initiative, [0]),
+            'percept': (entity.Perception, [8]),
+        }
+    )
 
 def human(loc):
     return entity.Entity(
         'human',
         loc, 
         *COMMON_TRAITS['human'],
-        (actions.personality_a, []),
-        (actions.personality_a_react, []),
         abilities = {
+            'act': (entity.PersonalityA, []),
             'life': (entity.Life, [random.randint(2,5), random.randint(-2,5)]),
+            'initiative': (entity.Initiative, [0]),
             'percept': (entity.Perception, [max(MAP_WIDTH, MAP_HEIGHT)]),
             'inventory': (entity.Inventory, [5]),
         }
@@ -134,10 +151,10 @@ def android(loc, version = 'a'):
         andr_type,
         loc, 
         *COMMON_TRAITS[andr_type],
-        (actions.personality_a, []),
-        (actions.personality_a_react, []),
         {
+            'act': (entity.PersonalityA, []),
             'life': (entity.Life, [random.randint(2,5), random.randint(-7,2)]),
+            'initiative': (entity.Initiative, [1]),
             'percept': (entity.Perception, [max(MAP_WIDTH, MAP_HEIGHT)]),
             'inventory': (entity.Inventory, [5]),
         }

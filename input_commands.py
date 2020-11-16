@@ -8,6 +8,7 @@ from settings import *
 from user_interface import interfaces as ui
 from user_interface import consoles
 from user_interface import keyboard
+from environment import actions
 
 
 def move(dm, parent, args):
@@ -18,17 +19,17 @@ def move(dm, parent, args):
         if not target.block.motion:
             parent.loc.update(loc)
         else:
-            ui.narrative.add('The {} blocks your way.'.format(target.name))
+            actions.melee_attack(dm, parent, target)
 
     except IndexError:
         # Player reached edge of environment
         ui.narrative.add('There is no way through here!')
-    
+
 
 def use(dm, parent, args):
     menu = ui.SelectMenu('Use from inventory:')
     target = menu.select(parent.inventory.items)
-    return target.react
+    target.act(dm)
 
 
 def use_from_ground(dm, parent, args):
@@ -38,8 +39,6 @@ def use_from_ground(dm, parent, args):
     
     # TODO enable player initiated use of items on ground
     return target.react
-    
-
 
 
 def pickup_select(dm, parent, args):
@@ -73,6 +72,7 @@ def help(dm, parent, args):
     help_ui.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, HELP_TEXT, [255,255,255], [0,0,0])
     help_ui.blit(True)
     keyboard.CharInput().capture_keypress()
+
 
 def tag_entity(dm, parent, args):
     loc = target_select(parent, None)
@@ -137,3 +137,19 @@ def target_select(dm, parent, args):
             loc = tuple([a+b for (a, b) in zip(loc, args)])
         else:
             return loc
+
+#TODO: this is broken
+def range_attack(dm, parent, target):
+    ui.narrative.add('You aim the gun...')
+    loc = target_select(dm, parent, target)
+    aim = los(target.loc(), loc)
+    path = aim.path(map=dm.terrain.motionmap)
+    ui.narrative.add('And dial distance;')
+    ui.narrative.add('The gun kicks as charged metal crackles through the air.')
+
+    for victim in [e for e in dm.entities if e.loc() in path and e != target]:
+        try:
+            victim.life.damage(random.randint(2,10))
+        except AttributeError:
+            ui.narrative.add(f'The {victim.name} smokes a little.')
+                

@@ -67,37 +67,6 @@ class DungeonMaster:
         path = astar(motionmap, start, end)
         return path
     
-    def progress_game(self):
-        # TODO: roll initiative
-        for e in self.entities:
-            # limit to pc for testing
-            if e is self.pc:
-                # Get 'primary' action from entity
-                fn, args = e.act
-                try:
-                    fn, args = fn(self, e, args)
-                except AttributeError:
-                    #this entity has no personality
-                    pass
-
-                # Perform actions until none are returned
-                while True:
-                    try:
-                        fn, args = fn(self, e, args)
-                    except TypeError:
-                        break
-
-                # Update entities field of view
-                try:
-                    e.percept.look(self.terrain)
-                    if e is self.pc:
-                        self.terrain.mark_as_seen(e.percept.fov)
-                except Exception as e:
-                    print(e)
-
-                # Rerender after each turn
-                self.render_game()
-
     def render_game(self):
         
         consoles.root_console.clear()
@@ -107,7 +76,27 @@ class DungeonMaster:
         ui.narrative.blit()
         ui.render_game(self.entities, self.terrain, self.pc.percept.fov)
         
-        tcod.console_flush()    
+        tcod.console_flush()
+
+    def progress_game(self):
+        # TODO: 'roll' initiative
+        for e in self.entities:
+            if hasattr(e, 'initiative'):
+                try:
+                    # Pass dm into entity act fn.
+                    e.act(self)
+
+                except (TypeError, UnboundLocalError):
+                    """ entity has no act attribute """
+
+                # Update entities field of view
+                if e is self.pc:
+                    e.percept.look(self.terrain)
+                    self.terrain.mark_as_seen(e.percept.fov)
+                
+                # Rerender after each turn
+                self.render_game()
+
 
 
 

@@ -39,7 +39,7 @@ def environment(envid, entry_loc):
     
     vacant_locs = terrain.unblocked_tiles()
     random.shuffle(vacant_locs)
-    
+    """ 
     # Exits
     if envid > 1:
         exit_up = el.stairs_up(entry_loc, terrain.id-1)
@@ -49,11 +49,14 @@ def environment(envid, entry_loc):
     if envid < 6:
         exit_down = el.stairs_down(vacant_locs.pop(), terrain.id+1)
         entities.add(exit_down)
-
+    """
     # Items
     radar = el.radar(vacant_locs.pop())
     entities.add(radar)
 
+    # test cat
+    cat = el.cat(vacant_locs.pop())
+    entities.add(cat)
 
     # Beings
     for i in range(random.randint(4,7)):
