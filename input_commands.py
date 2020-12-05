@@ -9,6 +9,7 @@ from user_interface import interfaces as ui
 from user_interface import consoles
 from user_interface import keyboard
 from environment import actions
+import pathfinding as pf
 
 
 def move(dm, parent, args):
@@ -19,7 +20,11 @@ def move(dm, parent, args):
         if not target.block.motion:
             parent.loc.update(loc)
         else:
-            actions.melee_attack(dm, parent, target)
+            try:
+                parent.combat.attack(target)
+            except Exception as e:
+                # Player cannot attack
+                print('player cannot attack!', e)
 
     except IndexError:
         # Player reached edge of environment
@@ -153,3 +158,12 @@ def range_attack(dm, parent, target):
         except AttributeError:
             ui.narrative.add(f'The {victim.name} smokes a little.')
                 
+                
+def interrogate(dm, parent, target):
+    selected_loc = target_select(dm, parent, None)
+    target_entity = next((e for e in dm.entities if hasattr(e, 'life') and e.loc() == selected_loc), None)
+    distance = round(pf.distance(parent.loc(), selected_loc), 2)
+    if target_entity:
+        ui.narrative.add(f'You interrogate {target_entity.name} from {distance}spans away.')
+    else:
+        ui.narrative.add(f'You interrogate anyone who cares to listen.')

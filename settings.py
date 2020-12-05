@@ -40,18 +40,21 @@ ACTION_KEYS = {
 Obj = namedtuple('Obj', ['glyph','fg', 'bg', 'block'])
 Block = namedtuple('Block', ['motion', 'sight'])
 
+AUTHORITIES = ['detective', 'police officer', 'player character']
+
 COMMON_TRAITS = {
-    'player character': Obj('@', [255, 255, 255], [0, 0, 0], Block(True, False)),
-    'human':            Obj('@', [255, 150, 180], [0, 0, 0], Block(True, False)),
-    'feline':           Obj('f', [180, 120, 80],  [0, 0, 0], Block(True, False)),
-    'android a':        Obj('@', [160, 160, 255], [0, 0, 0], Block(True, False)),
-    'android b':        Obj('@', [120, 120, 255], [0, 0, 0], Block(True, False)),
+    'player character': Obj('@', [255, 255, 255], [0, 0, 0], Block(True,  False)),
+    'citizen':          Obj('c', [210, 150, 180], [0, 0, 0], Block(True,  False)),
+    'police officer':   Obj('P', [100, 150, 255], [0, 0, 0], Block(True,  False)),
+    'detective':        Obj('D', [ 50,  50, 100], [0, 0, 0], Block(True,  False)),
+    'feline':           Obj('f', [180, 120,  80], [0, 0, 0], Block(True,  False)),
+    'sheep':            Obj('s', [200, 200, 200], [0 ,0 ,0], Block(True,  False)),
     'exit down':        Obj('>', [255, 255, 255], [0, 0, 0], Block(False, False)),
     'exit up':          Obj('<', [255, 255, 255], [0, 0, 0], Block(False, False)),
     'tech device':      Obj('+', [120, 150, 110], [0, 0, 0], Block(False, False)),
     'weapon':           Obj('/', [220, 220, 255], [0, 0, 0], Block(False, False)),
     'consumable':       Obj('%', [200, 120, 120], [0, 0, 0], Block(False, False)),
-    'ground':           Obj('.', [60, 60, 60], [25, 25, 25], Block(False, False)),
+    'ground':           Obj('.', [ 60,  60,  60], [25, 25, 25], Block(False, False)),
     'wall':             Obj('#', [120, 120, 120], [25, 25, 25], Block(True, True)),
 }
 
@@ -62,6 +65,8 @@ select: enter, numpad 5\n\
 u use from pack\n\
 U use from ground\n\
 d drop\n\
+I interrogate\n\
 , pickup\n\
 . look\n\
 "
+

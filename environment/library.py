@@ -58,15 +58,17 @@ def radar(loc):
     """
     
 def handgun(loc):
-    return entity.HandGun(loc)
-    """
+    # return entity.HandGun(loc)
+    
     return entity.Entity(
         'handgun',
         loc, 
         *COMMON_TRAITS['weapon'],
-        (actions.no_react, []),
+        abilities = {
+            'act': (entity.RangeWeapon, [3]),
+        }
     )
-    """
+    
 
 
 def stairs_down(loc, envid, coords=None):
@@ -104,11 +106,13 @@ def stairs_up(loc, envid, coords=None):
 ##############################
 
 def player_character(name, loc):
-    e = human(loc)
+    e = citizen(loc)
     # Customise character
+    e.kind = 'player character'
     e.title = name
     e.fg = [255,255,255]
-    e.life = entity.Life(e, random.randint(4,10), 5)
+    e.glyph = '@'
+    e.life = entity.Life(e, random.randint(8,16), 5)
     e.initiative.modifier += 1
     e.inventory.max = 10
     e.act = entity.PlayerInput(e)
@@ -124,38 +128,69 @@ def cat(loc):
         loc,
         *COMMON_TRAITS['feline'],
         abilities = {
-            'act': (entity.Follower, []),
-            'life': (entity.Life, [random.randint(2,5), random.randint(-2,5)]),
+            'act': (entity.Cat, []),
+            'life': (entity.Life, [random.randint(2,4)]),
             'initiative': (entity.Initiative, [0]),
-            'percept': (entity.Perception, [8]),
+            'percept': (entity.Perception, [20]),
+            'combat': (entity.Combat, [1, 1]),
         }
     )
-
-def human(loc):
+        
+def sheep(loc):
     return entity.Entity(
-        'human',
-        loc, 
-        *COMMON_TRAITS['human'],
+        'sheep',
+        loc,
+        *COMMON_TRAITS['sheep'],
         abilities = {
-            'act': (entity.PersonalityA, []),
-            'life': (entity.Life, [random.randint(2,5), random.randint(-2,5)]),
+            'act': (entity.Cat, []),
+            'life': (entity.Life, [random.randint(3,6)]),
             'initiative': (entity.Initiative, [0]),
-            'percept': (entity.Perception, [max(MAP_WIDTH, MAP_HEIGHT)]),
-            'inventory': (entity.Inventory, [5]),
+            'percept': (entity.Perception, [10]),
+            'combat': (entity.Combat, [1, 3]),
         }
     )
 
-def android(loc, version = 'a'):
-    andr_type = 'android ' + version
+def citizen(loc):
     return entity.Entity(
-        andr_type,
+        'citizen',
         loc, 
-        *COMMON_TRAITS[andr_type],
-        {
-            'act': (entity.PersonalityA, []),
-            'life': (entity.Life, [random.randint(2,5), random.randint(-7,2)]),
-            'initiative': (entity.Initiative, [1]),
-            'percept': (entity.Perception, [max(MAP_WIDTH, MAP_HEIGHT)]),
+        *COMMON_TRAITS['citizen'],
+        abilities = {
+            'act': (entity.Citizen, []),
+            'life': (entity.Life, [random.randint(2,5)]),
+            'initiative': (entity.Initiative, [0]),
+            'percept': (entity.Perception, [14]),
+            'inventory': (entity.Inventory, [2]),
+            'combat': (entity.Combat, [1, 1]),
+        }
+    )
+
+def detective(loc):
+    return entity.Entity(
+        'detective',
+        loc,
+        *COMMON_TRAITS['detective'],
+        abilities = {
+            'act': (entity.Sentry, []),
+            'life': (entity.Life, [random.randint(12,20)]),
+            'initiative': (entity.Initiative, [0]),
+            'percept': (entity.Perception, [18]),
             'inventory': (entity.Inventory, [5]),
+            'combat': (entity.Combat, [7, 5]),
+        }
+    )
+    
+def police(loc):
+    return entity.Entity(
+        'police officer',
+        loc,
+        *COMMON_TRAITS['police officer'],
+        abilities = {
+            'act': (entity.Sentry, []),
+            'life': (entity.Life, [random.randint(6,12)]),
+            'initiative': (entity.Initiative, [0]),
+            'percept': (entity.Perception, [16]),
+            'inventory': (entity.Inventory, [5]),
+            'combat': (entity.Combat, [3, 3]),
         }
     )

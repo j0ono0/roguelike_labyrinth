@@ -59,15 +59,21 @@ def environment(envid, entry_loc):
     entities.add(cat)
 
     # Beings
-    for i in range(random.randint(4,7)):
-        j = random.randint(1,100)
-        if j >= 10:
-            e = el.android(vacant_locs.pop(), random.choice(['a','b']))
-        elif j >= 30:
-            e = el.android(vacant_locs.pop(), random.choice(['a','b']))
-        else:
-            e = el.human(vacant_locs.pop())
-        
-        entities.add(e)
+    for i in range(random.randint(5,8)):
+        entities.add(el.citizen(vacant_locs.pop()))
     
+    entities.add(el.detective(vacant_locs.pop()))
+    
+    for i in range(random.randint(2,4)):
+        entities.add(el.police(vacant_locs.pop()))
+    
+    # Convert 3 humans to androids
+    candidates = ['police officer', 'detective', 'citizen']
+    print('androids:')
+    for a in random.sample([e for e in entities if e.kind in candidates], 3):
+        print(a.name)
+        a.life.android = True
+        a.fg = [100, 255, 120]
+
+        
     return (entities, terrain)

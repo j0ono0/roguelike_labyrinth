@@ -11,7 +11,7 @@ from user_interface import interfaces as ui
 from environment import terrain as terra
 from environment import library as el
 from environment import build
-from pathfinding import astar
+import pathfinding as pf
 from settings import LEVEL_PREFIX, MAP_HEIGHT, MAP_WIDTH
 
 
@@ -64,9 +64,14 @@ class DungeonMaster:
         else:
             motionmap = self.terrain.motionmap
         
-        path = astar(motionmap, start, end)
+        path = pf.astar(motionmap, start, end)
         return path
     
+    def vacant_locs(self):
+        # List of locs that are not blocked by terrain or entities
+        blocked_locs = (e.loc() for e in self.entities if e.block.motion)
+        return [loc for loc in self.terrain.unblocked_tiles() if loc not in blocked_locs]
+
     def render_game(self):
         
         consoles.root_console.clear()
@@ -185,7 +190,7 @@ def find_path(start, end, avoid_blocking_entities=False):
     else:
         motionmap = terrain.motionmap
     
-    path = astar(motionmap, start, end)
+    path = pf.astar(motionmap, start, end)
     return path
 
 
@@ -193,7 +198,6 @@ def random_empty_loc():
     entity_locs = set([e.loc for  e in entities])
     unblocked_locs = set([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])
     return random.choice(list(unblocked_locs.difference(entity_locs)))
-
 
 def random_unblocked_loc():
     return random.choice([(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if (terrain.tiles[x][y].block.motion == False)])

@@ -75,3 +75,12 @@ def dijkstra(graph, start):
                 visited[next] = current
                 heapq.heappush(frontier, (priority, next))
     return (visited, cost_tally)
+
+
+def flee_map(graph, start):
+    cost_map = dijkstra(graph, start)[1]
+    # Reverse movement costs so entity flees starting points
+    # Recalculate Dijkstra algorithm
+    cost_map = {key:value * -1.175 for (key, value) in cost_map.items()}
+    # Return resistance map
+    return dijkstra(graph, cost_map)[0]

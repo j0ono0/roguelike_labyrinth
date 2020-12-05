@@ -108,6 +108,7 @@ class GameInput(InputHandler):
             tcod.event.K_w: ('wield',[]),
         }
         self.caps_keymap = {
+            tcod.event.K_i: (cmd.interrogate,[]),
             tcod.event.K_t: (cmd.target_select,[]),
             tcod.event.K_u: (cmd.use_from_ground,[]),
         }

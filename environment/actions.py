@@ -41,8 +41,6 @@ class RelocateTarget:
 
 
 
-
-
 def display_entity_type(weilder, dm):
     
     kb = keyboard.CharInput()
@@ -101,19 +99,8 @@ def flee_map(target, dm):
     emap.blit(True)
     
     keyboard.CharInput().capture_keypress()
-    
 
-def no_act(dm, parent, args):
-    print(f'{parent} undertakes no action.')
-
-def no_react(dm, parent, args):
-    print(f'{parent} undertakes no reaction.')
 
 def block_path(dm, parent, other):
     ui.narrative.add(f'the {parent} blocks {other}.')
-
-def melee_attack(dm, parent, other):
-    ui.narrative.add(f'the {parent} attacks {other}.')
-    other.life.damage(random.randint(1,3))
-        
 
