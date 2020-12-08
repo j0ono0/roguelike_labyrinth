@@ -104,3 +104,50 @@ def flee_map(target, dm):
 def block_path(dm, parent, other):
     ui.narrative.add(f'the {parent} blocks {other}.')
 
+def target_select(dm, parent, args):
+    kb = keyboard.TargetInput()
+    loc = parent.loc()
+    seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if dm.terrain.tiles[x][y].seen == True]
+    
+    target_narrative = consoles.NarrativeConsole()
+    display = consoles.EntityConsole()
+    
+    while True:
+        target_narrative.clear()
+        if loc in seen_tiles:
+            try:
+                entities = [e for e in dm.entities if e.loc() == loc]
+                glyph = entities[0].glyph
+                if len(entities) > 7:
+                    txt = '{} and many other items.'.format(entities[0])
+                elif len(entities) > 1:
+                    txt = '{} and a few other items.'.format(entities[0])
+                else:
+                    txt = '{}.'.format(entities[0])
+            except IndexError:
+                """ No entities are at this location """
+                x, y = loc
+                txt = dm.terrain.tiles[x][y].name
+                glyph = dm.terrain.tiles[x][y].glyph
+
+            fg = [0,0,0]
+            bg = [255,255,255]
+            target_narrative.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, txt, [255, 255, 255], [0, 0, 0])
+        else:
+            glyph = ' '
+            fg = [0,0,0]
+            bg = [120,120,120]
+            
+        display.con.print(0, 0, glyph, fg, bg)
+        
+        # Update screen
+        dm.render_game()
+        target_narrative.blit()
+        display.blit(loc, True)
+        
+        # Wait for keypress
+        fn, args = kb.capture_keypress()
+        if fn == 'target':
+            loc = tuple([a+b for (a, b) in zip(loc, args)])
+        else:
+            return loc

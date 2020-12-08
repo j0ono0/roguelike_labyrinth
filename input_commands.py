@@ -4,12 +4,15 @@ Input commands are functions that are called from player input.
 All functions take a 'parent' (player's character) and 'args' (list of arguments). 
 
 """
+import math
+import random
 from settings import *
 from user_interface import interfaces as ui
 from user_interface import consoles
 from user_interface import keyboard
 from environment import actions
 import pathfinding as pf
+from environment import entity
 
 
 def move(dm, parent, args):
@@ -95,58 +98,10 @@ def tag_entity(dm, parent, args):
         target.bg = [100, 100, 200]
 
 
-def target_select(dm, parent, args):
-    kb = keyboard.TargetInput()
-    loc = parent.loc()
-    seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if dm.terrain.tiles[x][y].seen == True]
-    
-    target_narrative = consoles.NarrativeConsole()
-    display = consoles.EntityConsole()
-    
-    while True:
-        target_narrative.clear()
-        if loc in seen_tiles:
-            try:
-                entities = [e for e in dm.entities if e.loc() == loc]
-                glyph = entities[0].glyph
-                if len(entities) > 7:
-                    txt = '{} and many other items.'.format(entities[0])
-                elif len(entities) > 1:
-                    txt = '{} and a few other items.'.format(entities[0])
-                else:
-                    txt = '{}.'.format(entities[0])
-            except IndexError:
-                """ No entities are at this location """
-                x, y = loc
-                txt = dm.terrain.tiles[x][y].name
-                glyph = dm.terrain.tiles[x][y].glyph
-
-            fg = [0,0,0]
-            bg = [255,255,255]
-            target_narrative.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, txt, [255, 255, 255], [0, 0, 0])
-        else:
-            glyph = ' '
-            fg = [0,0,0]
-            bg = [120,120,120]
-            
-        display.con.print(0, 0, glyph, fg, bg)
-        
-        # Update screen
-        dm.render_game()
-        target_narrative.blit()
-        display.blit(loc, True)
-        
-        # Wait for keypress
-        fn, args = kb.capture_keypress()
-        if fn == 'target':
-            loc = tuple([a+b for (a, b) in zip(loc, args)])
-        else:
-            return loc
-
 #TODO: this is broken
 def range_attack(dm, parent, target):
     ui.narrative.add('You aim the gun...')
-    loc = target_select(dm, parent, target)
+    loc = actions.target_select(dm, parent, target)
     aim = los(target.loc(), loc)
     path = aim.path(map=dm.terrain.motionmap)
     ui.narrative.add('And dial distance;')
@@ -158,12 +113,18 @@ def range_attack(dm, parent, target):
         except AttributeError:
             ui.narrative.add(f'The {victim.name} smokes a little.')
                 
-                
+
 def interrogate(dm, parent, target):
-    selected_loc = target_select(dm, parent, None)
+    selected_loc = actions.target_select(dm, parent, None)
     target_entity = next((e for e in dm.entities if hasattr(e, 'life') and e.loc() == selected_loc), None)
-    distance = round(pf.distance(parent.loc(), selected_loc), 2)
-    if target_entity:
-        ui.narrative.add(f'You interrogate {target_entity.name} from {distance}spans away.')
+    distance = math.ceil(pf.distance(parent.loc(), selected_loc))
+    print(target_entity)
+    if target_entity.life.android:
+        confess = (1 / distance * 100) < random.randint(0,100)
+        if confess:
+            ui.narrative.add(f"{target_entity.name} cracks! It's an android!")
+            target_entity.act = entity.Cat(target_entity)
+        else:
+            ui.narrative.add(f"{target_entity.name} indicates 2 in 3 detectives are andys.")
     else:
-        ui.narrative.add(f'You interrogate anyone who cares to listen.')
+        ui.narrative.add(f'{target_entity.name} sweats but responds within reason.')

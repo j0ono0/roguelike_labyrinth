@@ -11,7 +11,6 @@ from user_interface import keyboard
 from . import actions
 from settings import COMMON_TRAITS, AUTHORITIES, Obj
 import pathfinding as pf
-from input_commands import target_select
 from line_of_sight import LineOfSight as los
 
 
@@ -204,16 +203,14 @@ class Citizen:
 class Sentry:
     def __init__(self, parent):
         self.parent = parent
-        self.fov = []
         self.pathmap = None # Dict
     
     def flee_current_loc(self, dm):
         coords = self.pathmap[self.parent.loc()]
-        print('fleeing current loc.')
         target = dm.get_target(coords, True)
         if not target.block.motion:
             self.parent.loc.update(coords)
-            self.fov = None
+            self.parent.percept.look(dm.terrain)
         else:
             #path is blocked
             self.pathmap = None
@@ -239,11 +236,7 @@ class Sentry:
                 self.flee_current_loc(dm)
         else:
             self.pathmap = None
-        
-            if not self.fov:
-                self.parent.percept.look(dm.terrain)
-            
-            if dm.pc.loc() in self.fov:
+            if dm.pc.loc() in self.parent.percept.fov:
                 aside = ' (android)' if self.parent.life.android else ''
                 ui.narrative.add(f'The {aside} {self.parent.name} stands at {self.parent.loc()}.')
         
@@ -401,7 +394,7 @@ class RangeWeapon:
 
     def __call__(self, dm):
         ui.narrative.add('You aim the gun...')
-        loc = target_select(dm, self.parent, None)
+        loc = actions.target_select(dm, self.parent, None)
         if self.charges > 0:
             self.charges -= 1
             aim = los(self.parent.loc(), loc)
@@ -430,7 +423,7 @@ class HandGun(Entity):
 
     def act(self, dm):
         ui.narrative.add(f'You aim the {self.name}.')
-        target_loc = target_select(dm, self, None)
+        target_loc = actions.target_select(dm, self, None)
         self.charges -= 1
         ui.narrative.add(f'the weapon discharges at {target_loc}. ({self.charges} left)')
 

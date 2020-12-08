@@ -96,7 +96,7 @@ class GameInput(InputHandler):
         
             tcod.event.K_ESCAPE:  ('application_menu',[]),
             tcod.event.K_COMMA:  (cmd.pickup_select,[]),
-            tcod.event.K_PERIOD:  (cmd.target_select,[]),
+            #tcod.event.K_PERIOD:  (cmd.look_at_loc,[]),
             tcod.event.K_a:  ('action_select',[]),
             tcod.event.K_d: (cmd.drop_select,[]),
             tcod.event.K_h: (cmd.help,[]),
@@ -109,7 +109,6 @@ class GameInput(InputHandler):
         }
         self.caps_keymap = {
             tcod.event.K_i: (cmd.interrogate,[]),
-            tcod.event.K_t: (cmd.target_select,[]),
             tcod.event.K_u: (cmd.use_from_ground,[]),
         }
 

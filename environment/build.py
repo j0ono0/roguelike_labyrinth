@@ -69,9 +69,7 @@ def environment(envid, entry_loc):
     
     # Convert 3 humans to androids
     candidates = ['police officer', 'detective', 'citizen']
-    print('androids:')
     for a in random.sample([e for e in entities if e.kind in candidates], 3):
-        print(a.name)
         a.life.android = True
         a.fg = [100, 255, 120]
 
