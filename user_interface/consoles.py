@@ -21,6 +21,25 @@ class NarrativeConsole:
             tcod.console_flush()
 
 
+class LabelConsole:
+    def __init__(self):
+        self.width = 0
+        self.height = 1
+        self.con = tcod.console.Console(self.width, self.height, order="F")
+    
+    def update(self, txt):
+        self.width = len(txt)
+        self.con = tcod.console.Console(self.width, self.height, order="F")
+        self.con.print(0, 0, txt, [0,0,0], [255,255,255])
+
+    def blit(self, offset, flush=False):
+        label_offset = [1, -1]
+        x, y = [a+b+c for a, b, c in zip(offset, MAP_OFFSET, label_offset)]
+        self.con.blit(root_console, x, y, 0, 0, self.width, self.height, 1, 1, 0)
+        if flush:
+            tcod.console_flush()
+
+
 class TerrainConsole:
     def __init__(self):
         self.con = tcod.console.Console(MAP_WIDTH, MAP_HEIGHT, order="F")

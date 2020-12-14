@@ -109,11 +109,11 @@ def target_select(dm, parent, args):
     loc = parent.loc()
     seen_tiles = [(x, y) for x in range(MAP_WIDTH) for y in range(MAP_HEIGHT) if dm.terrain.tiles[x][y].seen == True]
     
-    target_narrative = consoles.NarrativeConsole()
     display = consoles.EntityConsole()
+    label = consoles.LabelConsole()
     
     while True:
-        target_narrative.clear()
+        label.update('')
         if loc in seen_tiles:
             try:
                 entities = [e for e in dm.entities if e.loc() == loc]
@@ -124,26 +124,31 @@ def target_select(dm, parent, args):
                     txt = '{} and a few other items.'.format(entities[0])
                 else:
                     txt = '{}.'.format(entities[0])
+
+                label.update(txt)
+                
             except IndexError:
                 """ No entities are at this location """
                 x, y = loc
                 txt = dm.terrain.tiles[x][y].name
                 glyph = dm.terrain.tiles[x][y].glyph
+                
 
             fg = [0,0,0]
             bg = [255,255,255]
-            target_narrative.con.print_box(1, 1, NAR_WIDTH, NAR_HEIGHT, txt, [255, 255, 255], [0, 0, 0])
+
         else:
             glyph = ' '
             fg = [0,0,0]
             bg = [120,120,120]
-            
+
         display.con.print(0, 0, glyph, fg, bg)
         
         # Update screen
         dm.render_game()
-        target_narrative.blit()
+        label.blit(loc)
         display.blit(loc, True)
+        
         
         # Wait for keypress
         fn, args = kb.capture_keypress()
